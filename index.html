@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Economic Scenario Analysis Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style>
+    /* -----------------------------------------------------------------------
+       Design tokens
+    ----------------------------------------------------------------------- */
+    :root {
+      --bg:          #0d0d0d;
+      --surface:     #141414;
+      --surface-2:   #1a1a1a;
+      --border:      #222222;
+      --border-2:    #2a2a2a;
+      --amber:       #E8A020;
+      --amber-dim:   #b87c10;
+      --amber-glow:  rgba(232,160,32,0.12);
+      --amber-glow2: rgba(232,160,32,0.06);
+      --text:        #e8e8e8;
+      --text-muted:  #888888;
+      --text-dim:    #555555;
+      --green:       #4ade80;
+      --red:         #f87171;
+      --blue:        #60a5fa;
+      --radius:      6px;
+      --radius-lg:   10px;
+    }
+
+    /* -----------------------------------------------------------------------
+       Reset & base
+    ----------------------------------------------------------------------- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* -----------------------------------------------------------------------
+       Layout
+    ----------------------------------------------------------------------- */
+    .page-wrapper {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px 64px;
+    }
+
+    /* -----------------------------------------------------------------------
+       Header
+    ----------------------------------------------------------------------- */
+    .site-header {
+      border-bottom: 1px solid var(--border);
+      padding: 32px 0 28px;
+      margin-bottom: 40px;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .site-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: var(--text);
+    }
+
+    .site-title span {
+      color: var(--amber);
+    }
+
+    .site-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 400;
+    }
+
+    .header-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--amber-dim);
+      border: 1px solid var(--border-2);
+      padding: 4px 10px;
+      border-radius: var(--radius);
+      background: var(--amber-glow2);
+      white-space: nowrap;
+    }
+
+    /* -----------------------------------------------------------------------
+       Main grid
+    ----------------------------------------------------------------------- */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    /* -----------------------------------------------------------------------
+       Panels / cards
+    ----------------------------------------------------------------------- */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .panel-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-title::before {
+      content: '';
+      display: block;
+      width: 3px;
+      height: 12px;
+      background: var(--amber);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* -----------------------------------------------------------------------
+       Slider controls
+    ----------------------------------------------------------------------- */
+    .control-group {
+      margin-bottom: 24px;
+    }
+
+    .control-group:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .control-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .control-value {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--amber);
+      min-width: 48px;
+      text-align: right;
+    }
+
+    .control-desc {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      background: var(--border-2);
+      border-radius: 2px;
+      outline: none;
+      cursor: pointer;
+      position: relative;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--amber);
+      cursor: pointer;
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 1px var(--amber-dim);
+      transition: box-shadow 0.15s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 0 4px var(--amber-glow);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--amber);
+      cursor: pointer;
+      border: 2px solid var(--bg);
+      box-shadow: 0 0 0 1px var(--amber-dim);
+    }
+
+    .slider-track-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+
+    .slider-track-labels span {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    .run-btn {
+      display: block;
+      width: 100%;
+      margin-top: 28px;
+      padding: 12px 0;
+      background: var(--amber);
+      color: #000;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .run-btn:hover { background: #f0b040; }
+    .run-btn:active { transform: scale(0.98); }
+
+    .run-btn.animating {
+      animation: pulse-btn 0.4s ease;
+    }
+
+    @keyframes pulse-btn {
+      0%   { box-shadow: 0 0 0 0 rgba(232,160,32,0.6); }
+      70%  { box-shadow: 0 0 0 10px rgba(232,160,32,0); }
+      100% { box-shadow: 0 0 0 0 rgba(232,160,32,0); }
+    }
+
+    /* -----------------------------------------------------------------------
+       Right column
+    ----------------------------------------------------------------------- */
+    .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* -----------------------------------------------------------------------
+       Projection cards grid
+    ----------------------------------------------------------------------- */
+    .proj-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .proj-grid { grid-template-columns: 1fr; }
+    }
+
+    .proj-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+
+    .proj-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--amber-glow2);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .proj-card.updated::after {
+      opacity: 1;
+      animation: card-flash 0.5s ease forwards;
+    }
+
+    @keyframes card-flash {
+      0%   { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .proj-card-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 12px;
+    }
+
+    .proj-card-value {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 1;
+      color: var(--amber);
+      margin-bottom: 6px;
+      transition: color 0.3s;
+    }
+
+    .proj-card-value.good  { color: var(--green); }
+    .proj-card-value.warn  { color: #facc15; }
+    .proj-card-value.bad   { color: var(--red); }
+
+    .proj-card-sublabel {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .proj-card-bar {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-top: 14px;
+      overflow: hidden;
+    }
+
+    .proj-card-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--amber);
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1), background 0.3s;
+    }
+
+    /* -----------------------------------------------------------------------
+       Chart panel
+    ----------------------------------------------------------------------- */
+    .chart-container {
+      position: relative;
+      height: 260px;
+    }
+
+    .chart-legend {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* -----------------------------------------------------------------------
+       Comparison table
+    ----------------------------------------------------------------------- */
+    .comp-table-wrapper {
+      overflow-x: auto;
+    }
+
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .comp-table th {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 0 16px 12px 0;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .comp-table th:first-child { color: var(--text-dim); }
+
+    .comp-table td {
+      padding: 14px 16px 14px 0;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .comp-table tr:last-child td { border-bottom: none; }
+
+    .comp-table .row-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .comp-table .mono {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+    }
+
+    .scenario-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .badge-soft    { background: rgba(74,222,128,0.12); color: var(--green); }
+    .badge-stag    { background: rgba(248,113,113,0.12); color: var(--red); }
+    .badge-rec     { background: rgba(96,165,250,0.12); color: var(--blue); }
+
+    .current-scenario-label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--amber-glow);
+      color: var(--amber);
+      white-space: nowrap;
+    }
+
+    /* -----------------------------------------------------------------------
+       Section divider
+    ----------------------------------------------------------------------- */
+    .section-below {
+      margin-top: 24px;
+    }
+
+    /* -----------------------------------------------------------------------
+       Footer
+    ----------------------------------------------------------------------- */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      margin-top: 56px;
+      padding-top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-text {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .footer-text a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .footer-text a:hover { color: var(--amber); }
+
+    .footer-disclaimer {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-style: italic;
+    }
+
+    /* -----------------------------------------------------------------------
+       Utility
+    ----------------------------------------------------------------------- */
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- =====================================================================
+       HEADER
+  ====================================================================== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div>
+        <h1 class="site-title">Economic <span>Scenario Analysis</span></h1>
+        <p class="site-subtitle">Adjust Fed policy levers. See projected macro outcomes.</p>
+      </div>
+      <div class="header-badge">FRED Data 2000-2024</div>
+    </div>
+  </header>
+
+  <!-- =====================================================================
+       MAIN LAYOUT
+  ====================================================================== -->
+  <div class="main-grid">
+
+    <!-- ===================================================================
+         LEFT: SCENARIO CONTROLS
+    =================================================================== -->
+    <aside>
+      <div class="panel">
+        <h2 class="panel-title">Scenario Controls</h2>
+
+        <!-- Fed Funds Rate -->
+        <div class="control-group">
+          <div class="control-label">
+            <label class="control-name" for="slider-fed">Fed Funds Rate</label>
+            <span class="control-value" id="val-fed" aria-live="polite">4.50%</span>
+          </div>
+          <p class="control-desc">Target federal funds rate set by FOMC</p>
+          <input
+            type="range"
+            id="slider-fed"
+            min="0" max="8" step="0.25" value="4.5"
+            aria-label="Fed Funds Rate"
+          />
+          <div class="slider-track-labels">
+            <span>0%</span>
+            <span>4%</span>
+            <span>8%</span>
+          </div>
+        </div>
+
+        <!-- Inflation Target -->
+        <div class="control-group">
+          <div class="control-label">
+            <label class="control-name" for="slider-cpi">Inflation (CPI YoY)</label>
+            <span class="control-value" id="val-cpi" aria-live="polite">3.20%</span>
+          </div>
+          <p class="control-desc">Current year-over-year CPI reading</p>
+          <input
+            type="range"
+            id="slider-cpi"
+            min="1" max="6" step="0.1" value="3.2"
+            aria-label="Inflation CPI year over year"
+          />
+          <div class="slider-track-labels">
+            <span>1%</span>
+            <span>3.5%</span>
+            <span>6%</span>
+          </div>
+        </div>
+
+        <!-- Unemployment -->
+        <div class="control-group">
+          <div class="control-label">
+            <label class="control-name" for="slider-unemp">Unemployment Rate</label>
+            <span class="control-value" id="val-unemp" aria-live="polite">4.10%</span>
+          </div>
+          <p class="control-desc">Initial civilian unemployment rate (UNRATE)</p>
+          <input
+            type="range"
+            id="slider-unemp"
+            min="3" max="8" step="0.1" value="4.1"
+            aria-label="Initial unemployment rate"
+          />
+          <div class="slider-track-labels">
+            <span>3%</span>
+            <span>5.5%</span>
+            <span>8%</span>
+          </div>
+        </div>
+
+        <button class="run-btn" id="run-btn" type="button">Run Scenario</button>
+      </div>
+
+      <!-- Model notes -->
+      <div class="panel section-below" style="padding:16px 20px;">
+        <p class="panel-title" style="margin-bottom:12px;">Model Notes</p>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:8px;">
+          <li style="font-size:11px; color:var(--text-dim); padding-left:12px; border-left:2px solid var(--border-2);">
+            Unemployment projection uses Okun-style approximation: each 1pp rise in the fed rate above 2.5% adds ~0.15pp to unemployment over 12 months.
+          </li>
+          <li style="font-size:11px; color:var(--text-dim); padding-left:12px; border-left:2px solid var(--border-2);">
+            CPI projection applies a 30% pass-through persistence and an 8bp rate drag per 100bp of fed rate.
+          </li>
+          <li style="font-size:11px; color:var(--text-dim); padding-left:12px; border-left:2px solid var(--border-2);">
+            Recession probability uses a logistic function calibrated to historical rate-unemployment gaps.
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- ===================================================================
+         RIGHT: OUTPUT
+    =================================================================== -->
+    <div class="right-col">
+
+      <!-- Projection cards -->
+      <section aria-labelledby="proj-heading">
+        <h2 class="sr-only" id="proj-heading">12-Month Projections</h2>
+        <div class="proj-grid">
+
+          <div class="proj-card" id="card-unemp">
+            <p class="proj-card-label">Projected Unemployment (12mo)</p>
+            <p class="proj-card-value" id="proj-unemp">--.--%</p>
+            <p class="proj-card-sublabel">vs current <span id="curr-unemp-label">4.10%</span></p>
+            <div class="proj-card-bar">
+              <div class="proj-card-bar-fill" id="bar-unemp" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="proj-card" id="card-cpi">
+            <p class="proj-card-label">Projected CPI YoY (12mo)</p>
+            <p class="proj-card-value" id="proj-cpi">--.--%</p>
+            <p class="proj-card-sublabel">vs current <span id="curr-cpi-label">3.20%</span></p>
+            <div class="proj-card-bar">
+              <div class="proj-card-bar-fill" id="bar-cpi" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="proj-card" id="card-retail">
+            <p class="proj-card-label">Retail Sales Growth (12mo)</p>
+            <p class="proj-card-value" id="proj-retail">--.--%</p>
+            <p class="proj-card-sublabel">Advance retail sales YoY</p>
+            <div class="proj-card-bar">
+              <div class="proj-card-bar-fill" id="bar-retail" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="proj-card" id="card-recprob">
+            <p class="proj-card-label">Recession Probability</p>
+            <p class="proj-card-value" id="proj-recprob">--%</p>
+            <p class="proj-card-sublabel">12-month horizon estimate</p>
+            <div class="proj-card-bar">
+              <div class="proj-card-bar-fill" id="bar-recprob" style="width:0%"></div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Historical Chart -->
+      <div class="panel">
+        <h2 class="panel-title">Historical Context: Fed Rate vs Unemployment (2000-2024)</h2>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#E8A020;"></div>
+            <span>Fed Funds Rate (%)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#60a5fa;"></div>
+            <span>Unemployment Rate (%)</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="hist-chart" aria-label="Historical Federal Funds Rate and Unemployment Rate 2000 to 2024" role="img"></canvas>
+        </div>
+      </div>
+
+      <!-- Scenario comparison table -->
+      <div class="panel">
+        <h2 class="panel-title">Preset Scenario Comparison</h2>
+        <div class="comp-table-wrapper">
+          <table class="comp-table" aria-label="Preset scenario comparison">
+            <thead>
+              <tr>
+                <th scope="col">Indicator</th>
+                <th scope="col"><span class="scenario-badge badge-soft">Soft Landing</span></th>
+                <th scope="col"><span class="scenario-badge badge-stag">Stagflation</span></th>
+                <th scope="col"><span class="scenario-badge badge-rec">Recession</span></th>
+                <th scope="col"><span class="current-scenario-label" id="current-col-label">Current</span></th>
+              </tr>
+            </thead>
+            <tbody id="comp-table-body">
+              <!-- populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /right-col -->
+  </div><!-- /main-grid -->
+
+  <!-- =====================================================================
+       FOOTER
+  ====================================================================== -->
+  <footer class="site-footer">
+    <p class="footer-text">
+      Built by Akshay Kumar &middot;
+      <a href="https://akbknight.github.io" target="_blank" rel="noopener noreferrer">akbknight.github.io</a>
+    </p>
+    <p class="footer-disclaimer">
+      All projections are model-based estimates for educational purposes.
+      Not financial or investment advice.
+    </p>
+  </footer>
+
+</div><!-- /page-wrapper -->
+
+
+<!-- ==========================================================================
+     EMBEDDED DATA — pre-computed from FRED series 2000-2024
+     Sources: FEDFUNDS, UNRATE, CPIAUCSL, RSAFS (annual averages)
+========================================================================== -->
+<script>
+"use strict";
+
+/* ------------------------------------------------------------------
+   Historical data (embedded from FRED annual averages)
+------------------------------------------------------------------ */
+const HISTORICAL_DATA = [
+  { year: 2000, fed_rate: 6.24, unrate: 3.97, cpi_yoy: 3.37,  retail_yoy:  7.52 },
+  { year: 2001, fed_rate: 3.88, unrate: 4.74, cpi_yoy: 2.83,  retail_yoy:  2.11 },
+  { year: 2003, fed_rate: 1.13, unrate: 5.99, cpi_yoy: 2.27,  retail_yoy:  4.39 },
+  { year: 2006, fed_rate: 4.97, unrate: 4.61, cpi_yoy: 3.23,  retail_yoy:  6.54 },
+  { year: 2007, fed_rate: 5.02, unrate: 4.62, cpi_yoy: 2.85,  retail_yoy:  4.18 },
+  { year: 2008, fed_rate: 1.92, unrate: 5.80, cpi_yoy: 3.84,  retail_yoy: -0.61 },
+  { year: 2009, fed_rate: 0.24, unrate: 9.28, cpi_yoy: -0.36, retail_yoy: -6.88 },
+  { year: 2010, fed_rate: 0.18, unrate: 9.61, cpi_yoy: 1.64,  retail_yoy:  6.81 },
+  { year: 2015, fed_rate: 0.13, unrate: 5.28, cpi_yoy: 0.12,  retail_yoy:  2.01 },
+  { year: 2018, fed_rate: 1.83, unrate: 3.90, cpi_yoy: 2.44,  retail_yoy:  5.31 },
+  { year: 2019, fed_rate: 2.16, unrate: 3.67, cpi_yoy: 1.81,  retail_yoy:  3.79 },
+  { year: 2020, fed_rate: 0.36, unrate: 8.05, cpi_yoy: 1.23,  retail_yoy: -3.18 },
+  { year: 2021, fed_rate: 0.08, unrate: 5.35, cpi_yoy: 4.70,  retail_yoy: 17.62 },
+  { year: 2022, fed_rate: 1.68, unrate: 3.61, cpi_yoy: 8.00,  retail_yoy:  9.04 },
+  { year: 2023, fed_rate: 5.03, unrate: 3.62, cpi_yoy: 4.12,  retail_yoy:  2.21 },
+  { year: 2024, fed_rate: 5.33, unrate: 4.00, cpi_yoy: 2.90,  retail_yoy:  2.95 },
+];
+
+/* ------------------------------------------------------------------
+   Preset scenarios
+------------------------------------------------------------------ */
+const PRESETS = {
+  soft:   { label: "Soft Landing", fed_rate: 4.0,  cpi: 2.5, unemp: 4.0  },
+  stag:   { label: "Stagflation",  fed_rate: 6.5,  cpi: 5.5, unemp: 5.5  },
+  rec:    { label: "Recession",    fed_rate: 2.0,  cpi: 1.5, unemp: 6.5  },
+};
+
+/* ------------------------------------------------------------------
+   Projection model
+   All inputs/outputs in percent (e.g. 4.5 means 4.5%)
+------------------------------------------------------------------ */
+function runModel(fed_rate, cpi_input, unemp_input) {
+  // Okun-style approximation
+  let unemp_12mo = unemp_input + (fed_rate - 2.5) * 0.15;
+  unemp_12mo = clamp(unemp_12mo, 2.5, 12.0);
+
+  // CPI with rate drag and persistence
+  let cpi_12mo = cpi_input * 0.7 + fed_rate * -0.08;
+  cpi_12mo = clamp(cpi_12mo, -1.0, 10.0);
+
+  // Retail sales growth
+  let retail_growth = 2.8 - (unemp_12mo - 4.0) * 0.6;
+  retail_growth = clamp(retail_growth, -8.0, 12.0);
+
+  // Recession probability (logistic)
+  const z = -0.8 * (fed_rate - 5.0) + 0.4 * (unemp_12mo - 5.0);
+  let rec_prob = 1 / (1 + Math.exp(-z));
+  rec_prob = clamp(rec_prob, 0.01, 0.99);
+
+  return {
+    unemp_12mo:   round2(unemp_12mo),
+    cpi_12mo:     round2(cpi_12mo),
+    retail_growth: round2(retail_growth),
+    rec_prob:     Math.round(rec_prob * 100),
+  };
+}
+
+function clamp(val, min, max) {
+  return Math.max(min, Math.min(max, val));
+}
+
+function round2(val) {
+  return Math.round(val * 100) / 100;
+}
+
+function fmtPct(val, decimals = 2) {
+  return val.toFixed(decimals) + "%";
+}
+
+/* ------------------------------------------------------------------
+   DOM refs
+------------------------------------------------------------------ */
+const sliderFed   = document.getElementById("slider-fed");
+const sliderCpi   = document.getElementById("slider-cpi");
+const sliderUnemp = document.getElementById("slider-unemp");
+
+const valFed   = document.getElementById("val-fed");
+const valCpi   = document.getElementById("val-cpi");
+const valUnemp = document.getElementById("val-unemp");
+
+const projUnemp  = document.getElementById("proj-unemp");
+const projCpi    = document.getElementById("proj-cpi");
+const projRetail = document.getElementById("proj-retail");
+const projRec    = document.getElementById("proj-recprob");
+
+const barUnemp   = document.getElementById("bar-unemp");
+const barCpi     = document.getElementById("bar-cpi");
+const barRetail  = document.getElementById("bar-retail");
+const barRec     = document.getElementById("bar-recprob");
+
+const cardUnemp   = document.getElementById("card-unemp");
+const cardCpi     = document.getElementById("card-cpi");
+const cardRetail  = document.getElementById("card-retail");
+const cardRecprob = document.getElementById("card-recprob");
+
+const currUnempLabel = document.getElementById("curr-unemp-label");
+const currCpiLabel   = document.getElementById("curr-cpi-label");
+const runBtn         = document.getElementById("run-btn");
+const compTableBody  = document.getElementById("comp-table-body");
+
+/* ------------------------------------------------------------------
+   Slider display update (no model run)
+------------------------------------------------------------------ */
+function syncSliderLabels() {
+  valFed.textContent   = parseFloat(sliderFed.value).toFixed(2) + "%";
+  valCpi.textContent   = parseFloat(sliderCpi.value).toFixed(2) + "%";
+  valUnemp.textContent = parseFloat(sliderUnemp.value).toFixed(2) + "%";
+
+  currUnempLabel.textContent = parseFloat(sliderUnemp.value).toFixed(2) + "%";
+  currCpiLabel.textContent   = parseFloat(sliderCpi.value).toFixed(2) + "%";
+}
+
+/* ------------------------------------------------------------------
+   Apply color class to a projection value element
+------------------------------------------------------------------ */
+function applyColor(el, val, thresholds) {
+  // thresholds = { good: fn, warn: fn } — functions returning bool
+  el.classList.remove("good", "warn", "bad");
+  if (thresholds.good(val)) {
+    el.classList.add("good");
+  } else if (thresholds.warn(val)) {
+    el.classList.add("warn");
+  } else {
+    el.classList.add("bad");
+  }
+}
+
+/* ------------------------------------------------------------------
+   Flash card animation
+------------------------------------------------------------------ */
+function flashCard(card) {
+  card.classList.remove("updated");
+  // Force reflow to restart animation
+  void card.offsetWidth;
+  card.classList.add("updated");
+}
+
+/* ------------------------------------------------------------------
+   Main update function
+------------------------------------------------------------------ */
+function updateProjections(animate = false) {
+  const fed   = parseFloat(sliderFed.value);
+  const cpi   = parseFloat(sliderCpi.value);
+  const unemp = parseFloat(sliderUnemp.value);
+
+  const res = runModel(fed, cpi, unemp);
+
+  // Unemployment card
+  projUnemp.textContent = fmtPct(res.unemp_12mo);
+  applyColor(projUnemp, res.unemp_12mo, {
+    good: v => v < 4.5,
+    warn: v => v < 6.0,
+  });
+  // Bar: 0-12% range
+  barUnemp.style.width = clamp((res.unemp_12mo / 12) * 100, 0, 100) + "%";
+  barUnemp.style.background = projUnemp.classList.contains("good")
+    ? "var(--green)" : projUnemp.classList.contains("warn")
+    ? "#facc15" : "var(--red)";
+
+  // CPI card
+  projCpi.textContent = fmtPct(res.cpi_12mo);
+  applyColor(projCpi, res.cpi_12mo, {
+    good: v => v >= 1.5 && v <= 3.0,
+    warn: v => v > 3.0 && v <= 4.5,
+  });
+  // Bar: 0-10% range
+  barCpi.style.width = clamp((res.cpi_12mo / 10) * 100, 0, 100) + "%";
+  barCpi.style.background = projCpi.classList.contains("good")
+    ? "var(--green)" : projCpi.classList.contains("warn")
+    ? "#facc15" : "var(--red)";
+
+  // Retail card
+  projRetail.textContent = fmtPct(res.retail_growth);
+  applyColor(projRetail, res.retail_growth, {
+    good: v => v >= 2.0,
+    warn: v => v >= 0.0,
+  });
+  const retailBarPct = clamp(((res.retail_growth + 8) / 20) * 100, 0, 100);
+  barRetail.style.width = retailBarPct + "%";
+  barRetail.style.background = projRetail.classList.contains("good")
+    ? "var(--green)" : projRetail.classList.contains("warn")
+    ? "#facc15" : "var(--red)";
+
+  // Recession probability card
+  projRec.textContent = res.rec_prob + "%";
+  applyColor(projRec, res.rec_prob, {
+    good: v => v < 25,
+    warn: v => v < 50,
+  });
+  barRec.style.width = res.rec_prob + "%";
+  barRec.style.background = projRec.classList.contains("good")
+    ? "var(--green)" : projRec.classList.contains("warn")
+    ? "#facc15" : "var(--red)";
+
+  if (animate) {
+    [cardUnemp, cardCpi, cardRetail, cardRecprob].forEach(flashCard);
+  }
+
+  // Rebuild comparison table with updated "current" column
+  buildCompTable(res);
+}
+
+/* ------------------------------------------------------------------
+   Comparison table builder
+   Uses textContent only — no innerHTML with variable data
+------------------------------------------------------------------ */
+function buildCompTable(currentRes) {
+  // Compute projections for each preset
+  const presetResults = {};
+  for (const [key, preset] of Object.entries(PRESETS)) {
+    presetResults[key] = runModel(preset.fed_rate, preset.cpi, preset.unemp);
+  }
+
+  const rows = [
+    {
+      label: "Fed Funds Rate",
+      soft:    fmtPct(PRESETS.soft.fed_rate),
+      stag:    fmtPct(PRESETS.stag.fed_rate),
+      rec:     fmtPct(PRESETS.rec.fed_rate),
+      current: fmtPct(parseFloat(sliderFed.value), 2),
+      mono: true,
+    },
+    {
+      label: "Input CPI",
+      soft:    fmtPct(PRESETS.soft.cpi),
+      stag:    fmtPct(PRESETS.stag.cpi),
+      rec:     fmtPct(PRESETS.rec.cpi),
+      current: fmtPct(parseFloat(sliderCpi.value), 2),
+      mono: true,
+    },
+    {
+      label: "Initial Unemployment",
+      soft:    fmtPct(PRESETS.soft.unemp),
+      stag:    fmtPct(PRESETS.stag.unemp),
+      rec:     fmtPct(PRESETS.rec.unemp),
+      current: fmtPct(parseFloat(sliderUnemp.value), 2),
+      mono: true,
+    },
+    {
+      label: "Projected Unemployment",
+      soft:    fmtPct(presetResults.soft.unemp_12mo),
+      stag:    fmtPct(presetResults.stag.unemp_12mo),
+      rec:     fmtPct(presetResults.rec.unemp_12mo),
+      current: fmtPct(currentRes.unemp_12mo),
+      mono: true,
+    },
+    {
+      label: "Projected CPI",
+      soft:    fmtPct(presetResults.soft.cpi_12mo),
+      stag:    fmtPct(presetResults.stag.cpi_12mo),
+      rec:     fmtPct(presetResults.rec.cpi_12mo),
+      current: fmtPct(currentRes.cpi_12mo),
+      mono: true,
+    },
+    {
+      label: "Retail Growth",
+      soft:    fmtPct(presetResults.soft.retail_growth),
+      stag:    fmtPct(presetResults.stag.retail_growth),
+      rec:     fmtPct(presetResults.rec.retail_growth),
+      current: fmtPct(currentRes.retail_growth),
+      mono: true,
+    },
+    {
+      label: "Recession Probability",
+      soft:    presetResults.soft.rec_prob + "%",
+      stag:    presetResults.stag.rec_prob + "%",
+      rec:     presetResults.rec.rec_prob + "%",
+      current: currentRes.rec_prob + "%",
+      mono: true,
+    },
+  ];
+
+  // Clear existing rows safely
+  while (compTableBody.firstChild) {
+    compTableBody.removeChild(compTableBody.firstChild);
+  }
+
+  for (const row of rows) {
+    const tr = document.createElement("tr");
+
+    const tdLabel = document.createElement("td");
+    tdLabel.className = "row-label";
+    tdLabel.textContent = row.label;
+    tr.appendChild(tdLabel);
+
+    for (const key of ["soft", "stag", "rec", "current"]) {
+      const td = document.createElement("td");
+      if (row.mono) td.className = "mono";
+      td.textContent = row[key];
+      tr.appendChild(td);
+    }
+
+    compTableBody.appendChild(tr);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Chart.js — historical context
+------------------------------------------------------------------ */
+function buildChart() {
+  const labels = HISTORICAL_DATA.map(d => String(d.year));
+  const fedData = HISTORICAL_DATA.map(d => d.fed_rate);
+  const unrData = HISTORICAL_DATA.map(d => d.unrate);
+
+  const ctx = document.getElementById("hist-chart").getContext("2d");
+
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Fed Funds Rate (%)",
+          data: fedData,
+          borderColor: "#E8A020",
+          backgroundColor: "rgba(232,160,32,0.08)",
+          pointBackgroundColor: "#E8A020",
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: 0.35,
+          fill: false,
+          borderWidth: 2,
+        },
+        {
+          label: "Unemployment Rate (%)",
+          data: unrData,
+          borderColor: "#60a5fa",
+          backgroundColor: "rgba(96,165,250,0.08)",
+          pointBackgroundColor: "#60a5fa",
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          tension: 0.35,
+          fill: false,
+          borderWidth: 2,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: "index",
+        intersect: false,
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "#1a1a1a",
+          borderColor: "#2a2a2a",
+          borderWidth: 1,
+          titleColor: "#888",
+          bodyColor: "#e8e8e8",
+          padding: 12,
+          callbacks: {
+            label: function(ctx) {
+              return " " + ctx.dataset.label + ": " + ctx.parsed.y.toFixed(2) + "%";
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          grid: {
+            color: "rgba(255,255,255,0.04)",
+            drawBorder: false,
+          },
+          ticks: {
+            color: "#555",
+            font: { family: "'IBM Plex Mono', monospace", size: 10 },
+            maxRotation: 45,
+          },
+        },
+        y: {
+          min: -1,
+          max: 11,
+          grid: {
+            color: "rgba(255,255,255,0.04)",
+            drawBorder: false,
+          },
+          ticks: {
+            color: "#555",
+            font: { family: "'IBM Plex Mono', monospace", size: 10 },
+            callback: val => val + "%",
+          },
+        },
+      },
+    },
+  });
+}
+
+/* ------------------------------------------------------------------
+   Event listeners
+------------------------------------------------------------------ */
+sliderFed.addEventListener("input", () => {
+  syncSliderLabels();
+  updateProjections(false);
+});
+
+sliderCpi.addEventListener("input", () => {
+  syncSliderLabels();
+  updateProjections(false);
+});
+
+sliderUnemp.addEventListener("input", () => {
+  syncSliderLabels();
+  updateProjections(false);
+});
+
+runBtn.addEventListener("click", () => {
+  runBtn.classList.remove("animating");
+  void runBtn.offsetWidth;
+  runBtn.classList.add("animating");
+  updateProjections(true);
+  runBtn.addEventListener("animationend", () => {
+    runBtn.classList.remove("animating");
+  }, { once: true });
+});
+
+/* ------------------------------------------------------------------
+   Init
+------------------------------------------------------------------ */
+syncSliderLabels();
+updateProjections(false);
+buildChart();
+</script>
+</body>
+</html>
