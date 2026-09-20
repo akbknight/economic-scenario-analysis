@@ -12,25 +12,73 @@
     /* -----------------------------------------------------------------------
        Design tokens
     ----------------------------------------------------------------------- */
-    :root {
+    :root, :root[data-theme="dark"] {
       --bg:          #0d0d0d;
       --surface:     #141414;
       --surface-2:   #1a1a1a;
-      --border:      #222222;
-      --border-2:    #2a2a2a;
+      --border:      rgba(255,255,255,0.08);
+      --border-2:    rgba(255,255,255,0.12);
       --amber:       #E8A020;
       --amber-dim:   #b87c10;
-      --amber-glow:  rgba(232,160,32,0.12);
-      --amber-glow2: rgba(232,160,32,0.06);
-      --text:        #e8e8e8;
-      --text-muted:  #888888;
-      --text-dim:    #555555;
+      --amber-glow:  rgba(232,160,32,0.15);
+      --amber-glow2: rgba(232,160,32,0.08);
+      --text:        #f3f4f6;
+      --text-muted:  #9ca3af;
+      --text-dim:    #6b7280;
       --green:       #4ade80;
       --red:         #f87171;
       --blue:        #60a5fa;
+      --yellow:      #fbbf24;
       --radius:      6px;
       --radius-lg:   10px;
     }
+
+    :root[data-theme="light"] {
+      --bg:          #f8f7f4;
+      --surface:     #ffffff;
+      --surface-2:   #f0efeb;
+      --border:      rgba(0,0,0,0.08);
+      --border-2:    rgba(0,0,0,0.12);
+      --amber:       #c47800;
+      --amber-dim:   #9e6000;
+      --amber-glow:  rgba(196,120,0,0.12);
+      --amber-glow2: rgba(196,120,0,0.06);
+      --text:        #111827;
+      --text-muted:  #4b5563;
+      --text-dim:    #6b7280;
+      --green:       #16a34a;
+      --red:         #dc2626;
+      --blue:        #1d6fb5;
+      --yellow:      #d97706;
+      --radius:      6px;
+      --radius-lg:   10px;
+    }
+
+    .theme-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 0.3rem 0.75rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .theme-toggle-btn:hover {
+      border-color: var(--amber);
+      color: var(--amber);
+      transform: translateY(-1px);
+    }
+    [data-theme="dark"] .theme-icon-sun { display: inline-block; }
+    [data-theme="dark"] .theme-icon-moon { display: none; }
+    [data-theme="light"] .theme-icon-sun { display: none; }
+    [data-theme="light"] .theme-icon-moon { display: inline-block; }
 
     /* -----------------------------------------------------------------------
        Reset & base
@@ -46,6 +94,7 @@
       font-size: 14px;
       line-height: 1.6;
       min-height: 100vh;
+      transition: background 0.2s, color 0.2s;
     }
 
     /* -----------------------------------------------------------------------
@@ -520,6 +569,36 @@
   </style>
 </head>
 <body>
+
+<!-- UNIFIED PORTFOLIO ECOSYSTEM TOP BAR -->
+<nav style="background:var(--bg);border-bottom:1px solid var(--border);padding:0.6rem 1.5rem;font-family:'Inter',system-ui,sans-serif;position:sticky;top:0;z-index:9999;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:background 0.2s,border-color 0.2s;">
+  <div style="max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <a href="https://akbknight.github.io/" style="display:inline-flex;align-items:center;gap:0.4rem;color:#38bdf8;text-decoration:none;font-size:0.75rem;font-family:'IBM Plex Mono',monospace;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);padding:0.3rem 0.7rem;border-radius:9999px;">
+        <span>←</span> AKSHAY KUMAR · PORTFOLIO
+      </a>
+      <span style="font-size:0.75rem;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;">/</span>
+      <span style="font-size:0.75rem;color:var(--text);font-weight:500;">Economic Scenario Analysis</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.85rem;">
+      <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle Light / Dark Mode" title="Toggle Light / Dark Mode">
+        <span class="theme-icon-sun">☀️</span>
+        <span class="theme-icon-moon">🌙</span>
+        <span id="themeLabel">Dark</span>
+      </button>
+      <a href="https://www.linkedin.com/in/akshaykumardl/" target="_blank" rel="noopener noreferrer" style="font-size:0.75rem;color:var(--text-muted);text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.2a1.62 1.62 0 0 0-1.63 1.62c0 .89.73 1.62 1.63 1.62.9 0 1.63-.73 1.63-1.62A1.62 1.62 0 0 0 7.83 6.2Z"/></svg>
+        LinkedIn ↗
+      </a>
+      <a href="https://akbknight.github.io/assets/Akshay_Resume.pdf" download="Akshay_Kumar_Resume.pdf" style="font-size:0.75rem;color:var(--text);text-decoration:none;background:var(--surface);border:1px solid var(--border);padding:0.25rem 0.6rem;border-radius:6px;font-family:'IBM Plex Mono',monospace;">
+        Resume PDF ↓
+      </a>
+      <a href="https://github.com/akbknight/economic-scenario-analysis" target="_blank" rel="noopener noreferrer" style="font-size:0.75rem;color:var(--text-muted);text-decoration:none;">
+        GitHub Repo ↗
+      </a>
+    </div>
+  </div>
+</nav>
 
 <div class="page-wrapper">
 
@@ -1046,14 +1125,26 @@ function buildCompTable(currentRes) {
 /* ------------------------------------------------------------------
    Chart.js — historical context
 ------------------------------------------------------------------ */
+let histChart = null;
+
 function buildChart() {
   const labels = HISTORICAL_DATA.map(d => String(d.year));
   const fedData = HISTORICAL_DATA.map(d => d.fed_rate);
   const unrData = HISTORICAL_DATA.map(d => d.unrate);
 
-  const ctx = document.getElementById("hist-chart").getContext("2d");
+  const canvas = document.getElementById("hist-chart");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (histChart) { histChart.destroy(); histChart = null; }
 
-  new Chart(ctx, {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)';
+  const tickColor = isLight ? '#6b7280' : '#888888';
+  const tooltipBg = isLight ? '#ffffff' : '#1a1a1a';
+  const tooltipBorder = isLight ? 'rgba(0,0,0,0.1)' : '#2a2a2a';
+  const tooltipTitle = isLight ? '#111827' : '#e8e8e8';
+
+  histChart = new Chart(ctx, {
     type: "line",
     data: {
       labels,
@@ -1061,9 +1152,9 @@ function buildChart() {
         {
           label: "Fed Funds Rate (%)",
           data: fedData,
-          borderColor: "#E8A020",
-          backgroundColor: "rgba(232,160,32,0.08)",
-          pointBackgroundColor: "#E8A020",
+          borderColor: isLight ? "#c47800" : "#E8A020",
+          backgroundColor: isLight ? "rgba(196,120,0,0.08)" : "rgba(232,160,32,0.08)",
+          pointBackgroundColor: isLight ? "#c47800" : "#E8A020",
           pointRadius: 4,
           pointHoverRadius: 6,
           tension: 0.35,
@@ -1073,9 +1164,9 @@ function buildChart() {
         {
           label: "Unemployment Rate (%)",
           data: unrData,
-          borderColor: "#60a5fa",
-          backgroundColor: "rgba(96,165,250,0.08)",
-          pointBackgroundColor: "#60a5fa",
+          borderColor: isLight ? "#1d6fb5" : "#60a5fa",
+          backgroundColor: isLight ? "rgba(29,111,181,0.08)" : "rgba(96,165,250,0.08)",
+          pointBackgroundColor: isLight ? "#1d6fb5" : "#60a5fa",
           pointRadius: 4,
           pointHoverRadius: 6,
           tension: 0.35,
@@ -1094,11 +1185,11 @@ function buildChart() {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: "#1a1a1a",
-          borderColor: "#2a2a2a",
+          backgroundColor: tooltipBg,
+          borderColor: tooltipBorder,
           borderWidth: 1,
-          titleColor: "#888",
-          bodyColor: "#e8e8e8",
+          titleColor: tooltipTitle,
+          bodyColor: isLight ? "#374151" : "#e8e8e8",
           padding: 12,
           callbacks: {
             label: function(ctx) {
@@ -1110,11 +1201,11 @@ function buildChart() {
       scales: {
         x: {
           grid: {
-            color: "rgba(255,255,255,0.04)",
+            color: gridColor,
             drawBorder: false,
           },
           ticks: {
-            color: "#555",
+            color: tickColor,
             font: { family: "'IBM Plex Mono', monospace", size: 10 },
             maxRotation: 45,
           },
@@ -1123,17 +1214,50 @@ function buildChart() {
           min: -1,
           max: 11,
           grid: {
-            color: "rgba(255,255,255,0.04)",
+            color: gridColor,
             drawBorder: false,
           },
           ticks: {
-            color: "#555",
+            color: tickColor,
             font: { family: "'IBM Plex Mono', monospace", size: 10 },
             callback: val => val + "%",
           },
         },
       },
     },
+  });
+}
+
+/* ------------------------------------------------------------------
+   Theme Management
+------------------------------------------------------------------ */
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('ak_theme', t);
+  localStorage.setItem('theme', t);
+  const label = document.getElementById('themeLabel');
+  if (label) label.textContent = t === 'dark' ? 'Dark' : 'Light';
+  if (typeof buildChart === 'function') buildChart();
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('ak_theme') || localStorage.getItem('theme');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const t = saved ? saved : (prefersDark ? 'dark' : 'light');
+  applyTheme(t);
+}
+
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem('ak_theme') && !localStorage.getItem('theme')) {
+      applyTheme(e.matches ? 'dark' : 'light');
+    }
   });
 }
 
@@ -1168,6 +1292,7 @@ runBtn.addEventListener("click", () => {
 /* ------------------------------------------------------------------
    Init
 ------------------------------------------------------------------ */
+initTheme();
 syncSliderLabels();
 updateProjections(false);
 buildChart();
