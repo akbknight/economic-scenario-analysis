@@ -347,6 +347,78 @@
       color: var(--text-dim);
     }
 
+    /* -----------------------------------------------------------------------
+       Model Engine Selector
+    ----------------------------------------------------------------------- */
+    .mode-toggle-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      background: var(--surface-2);
+      padding: 4px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      margin-top: 8px;
+    }
+
+    .mode-toggle-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 7px 8px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .mode-toggle-btn.active {
+      background: var(--surface);
+      color: var(--amber);
+      border-color: var(--amber-dim);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+
+    .mode-toggle-btn:hover:not(.active) {
+      color: var(--text);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .proj-card-ci {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      margin-top: 6px;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+    }
+
+    .proj-card-ci.active-ci {
+      color: var(--amber);
+      font-weight: 500;
+    }
+
+    .econ-badge {
+      display: inline-block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--surface-2);
+      border: 1px solid var(--border-2);
+      color: var(--text-muted);
+    }
+
+    .econ-badge.sig {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: var(--green);
+    }
+
     .run-btn {
       display: block;
       width: 100%;
@@ -741,6 +813,25 @@
       <div class="panel">
         <h2 class="panel-title">Scenario Controls</h2>
 
+        <!-- Model Engine Selector -->
+        <div class="control-group" style="margin-bottom: 20px;">
+          <div class="control-label">
+            <span class="control-name">Model Engine</span>
+            <span class="control-value" id="val-mode-indicator" style="font-size: 0.72rem; color: var(--amber);">Calibrated Policy</span>
+          </div>
+          <div class="mode-toggle-group" role="group" aria-label="Model Engine Selection">
+            <button type="button" class="mode-toggle-btn active" id="btn-mode-calibrated" data-mode="calibrated">
+              Calibrated Baseline
+            </button>
+            <button type="button" class="mode-toggle-btn" id="btn-mode-empirical" data-mode="empirical">
+              Empirical OLS (95% CI)
+            </button>
+          </div>
+          <p class="control-desc" id="mode-desc" style="margin-top: 6px;">
+            Policy rule-of-thumb heuristics (Taylor/Okun baseline).
+          </p>
+        </div>
+
         <!-- Fed Funds Rate -->
         <div class="control-group">
           <div class="control-label">
@@ -835,6 +926,7 @@
             <p class="proj-card-label">Projected Unemployment (12mo)</p>
             <p class="proj-card-value" id="proj-unemp">--.--%</p>
             <p class="proj-card-sublabel">vs current <span id="curr-unemp-label">4.10%</span></p>
+            <div class="proj-card-ci" id="ci-unemp">Point estimate · Stylized rule</div>
             <div class="proj-card-bar">
               <div class="proj-card-bar-fill" id="bar-unemp" style="width:0%"></div>
             </div>
@@ -844,6 +936,7 @@
             <p class="proj-card-label">Projected CPI YoY (12mo)</p>
             <p class="proj-card-value" id="proj-cpi">--.--%</p>
             <p class="proj-card-sublabel">vs current <span id="curr-cpi-label">3.20%</span></p>
+            <div class="proj-card-ci" id="ci-cpi">Point estimate · Stylized rule</div>
             <div class="proj-card-bar">
               <div class="proj-card-bar-fill" id="bar-cpi" style="width:0%"></div>
             </div>
@@ -853,6 +946,7 @@
             <p class="proj-card-label">Retail Sales Growth (12mo)</p>
             <p class="proj-card-value" id="proj-retail">--.--%</p>
             <p class="proj-card-sublabel">Advance retail sales YoY</p>
+            <div class="proj-card-ci" id="ci-retail">Point estimate · Stylized rule</div>
             <div class="proj-card-bar">
               <div class="proj-card-bar-fill" id="bar-retail" style="width:0%"></div>
             </div>
@@ -862,6 +956,7 @@
             <p class="proj-card-label">Recession Probability</p>
             <p class="proj-card-value" id="proj-recprob">--%</p>
             <p class="proj-card-sublabel">12-month horizon estimate</p>
+            <div class="proj-card-ci" id="ci-recprob">Point estimate · Stylized rule</div>
             <div class="proj-card-bar">
               <div class="proj-card-bar-fill" id="bar-recprob" style="width:0%"></div>
             </div>
@@ -890,15 +985,18 @@
 
       <!-- Scenario comparison table -->
       <div class="panel">
-        <h2 class="panel-title">Preset Scenario Comparison</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+          <h2 class="panel-title" style="margin:0;">Preset Scenario Comparison</h2>
+          <span style="font-size:0.72rem; color:var(--text-dim); font-family:'IBM Plex Mono', monospace;">Click preset badge to apply to sliders</span>
+        </div>
         <div class="comp-table-wrapper">
           <table class="comp-table" aria-label="Preset scenario comparison">
             <thead>
               <tr>
                 <th scope="col">Indicator</th>
-                <th scope="col"><span class="scenario-badge badge-soft">Soft Landing</span></th>
-                <th scope="col"><span class="scenario-badge badge-stag">Stagflation</span></th>
-                <th scope="col"><span class="scenario-badge badge-rec">Recession</span></th>
+                <th scope="col"><button type="button" class="scenario-badge badge-soft" id="btn-preset-soft" style="cursor:pointer; border:none;" title="Click to apply Soft Landing parameters">Soft Landing ↗</button></th>
+                <th scope="col"><button type="button" class="scenario-badge badge-stag" id="btn-preset-stag" style="cursor:pointer; border:none;" title="Click to apply Stagflation parameters">Stagflation ↗</button></th>
+                <th scope="col"><button type="button" class="scenario-badge badge-rec" id="btn-preset-rec" style="cursor:pointer; border:none;" title="Click to apply Recession parameters">Recession ↗</button></th>
                 <th scope="col"><span class="current-scenario-label" id="current-col-label">Current</span></th>
               </tr>
             </thead>
@@ -911,6 +1009,83 @@
 
     </div><!-- /right-col -->
   </div><!-- /main-grid -->
+
+  <!-- =====================================================================
+       ECONOMETRIC ESTIMATION ARCHITECTURE & PARAMETER ESTIMATES
+  ====================================================================== -->
+  <div class="panel section-below" id="econometric-panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+      <div>
+        <h2 class="panel-title" style="margin-bottom:4px;">Econometric Parameter Estimation Architecture</h2>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">
+          Estimated via Ordinary Least Squares (OLS) and Maximum Likelihood (Logit) on FRED annual macroeconomic series (2000–2024, N=16 benchmark regimes).
+        </p>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <span class="econ-badge sig">p &lt; 0.05 Statistically Significant</span>
+        <span class="econ-badge">95% Confidence Bounds (±1.96·SE)</span>
+      </div>
+    </div>
+
+    <div class="comp-table-wrapper">
+      <table class="comp-table" style="font-size:0.78rem;">
+        <thead>
+          <tr>
+            <th scope="col">Model / Dependent Variable</th>
+            <th scope="col">Specification Formula</th>
+            <th scope="col">Estimated Parameter</th>
+            <th scope="col">Std Error</th>
+            <th scope="col">t-stat / z</th>
+            <th scope="col">p-value</th>
+            <th scope="col">R² / Fit</th>
+            <th scope="col">95% Confidence Band</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="row-label">Unemployment (12mo)</td>
+            <td class="mono">u_{12} = u_0 + \beta_r(r - 2.5)</td>
+            <td class="mono">\beta_r = +0.1520</td>
+            <td class="mono">0.0710</td>
+            <td class="mono">2.141</td>
+            <td class="mono"><span class="econ-badge sig">0.043*</span></td>
+            <td class="mono">0.170</td>
+            <td class="mono">\pm 1.96 \times \sqrt{s_0^2 + (\Delta r \cdot SE)^2}</td>
+          </tr>
+          <tr>
+            <td class="row-label">CPI Inflation (12mo)</td>
+            <td class="mono">\pi_{12} = \alpha + \beta_\pi \pi_0 + \beta_r r</td>
+            <td class="mono">\beta_\pi = 0.6480, \beta_r = -0.0760</td>
+            <td class="mono">0.1420 / 0.0840</td>
+            <td class="mono">4.563 / -0.905</td>
+            <td class="mono"><span class="econ-badge sig">&lt;0.001*</span> / 0.382</td>
+            <td class="mono">s_e = 1.15%</td>
+            <td class="mono">\pm 1.96 \times s_e (\pm 2.25\%)</td>
+          </tr>
+          <tr>
+            <td class="row-label">Retail Sales Growth (12mo)</td>
+            <td class="mono">g_{ret} = \beta_0 + \beta_u \cdot u_{12}</td>
+            <td class="mono">\beta_0 = 9.9077, \beta_u = -1.1000</td>
+            <td class="mono">3.880 / 0.680</td>
+            <td class="mono">2.554 / -1.618</td>
+            <td class="mono"><span class="econ-badge sig">0.023*</span> / 0.128</td>
+            <td class="mono">0.1575</td>
+            <td class="mono">\pm 1.96 \times s_e \sqrt{1/N + (u - \bar{u})^2 / SS_u}</td>
+          </tr>
+          <tr>
+            <td class="row-label">Recession Probability (Logit)</td>
+            <td class="mono">z = \beta_0 + \beta_r r + \beta_u u_{12}</td>
+            <td class="mono">\beta_0 = -5.138, \beta_r = 0.126, \beta_u = 0.652</td>
+            <td class="mono">3.560 / 0.433 / 0.464</td>
+            <td class="mono">-1.44 / 0.29 / 1.41</td>
+            <td class="mono">0.149 / 0.772 / 0.160</td>
+            <td class="mono">Pseudo R² 0.198</td>
+            <td class="mono">P = 1 / (1 + e^{-z})</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
   
   <!-- Methodological Architecture -->
@@ -955,84 +1130,18 @@
 
 
 <!-- ==========================================================================
-     EMBEDDED DATA — pre-computed from FRED series 2000-2024
-     Sources: FEDFUNDS, UNRATE, CPIAUCSL, RSAFS (annual averages)
+     SHARED MODULES — single implementation shared with test harnesses
 ========================================================================== -->
+<script src="src/js/config.js"></script>
+<script src="src/js/model.js"></script>
+
 <script>
 "use strict";
 
 /* ------------------------------------------------------------------
-   Historical data (embedded from FRED annual averages)
+   Active Model Engine State
 ------------------------------------------------------------------ */
-const HISTORICAL_DATA = [
-  { year: 2000, fed_rate: 6.24, unrate: 3.97, cpi_yoy: 3.37,  retail_yoy:  7.52 },
-  { year: 2001, fed_rate: 3.88, unrate: 4.74, cpi_yoy: 2.83,  retail_yoy:  2.11 },
-  { year: 2003, fed_rate: 1.13, unrate: 5.99, cpi_yoy: 2.27,  retail_yoy:  4.39 },
-  { year: 2006, fed_rate: 4.97, unrate: 4.61, cpi_yoy: 3.23,  retail_yoy:  6.54 },
-  { year: 2007, fed_rate: 5.02, unrate: 4.62, cpi_yoy: 2.85,  retail_yoy:  4.18 },
-  { year: 2008, fed_rate: 1.92, unrate: 5.80, cpi_yoy: 3.84,  retail_yoy: -0.61 },
-  { year: 2009, fed_rate: 0.24, unrate: 9.28, cpi_yoy: -0.36, retail_yoy: -6.88 },
-  { year: 2010, fed_rate: 0.18, unrate: 9.61, cpi_yoy: 1.64,  retail_yoy:  6.81 },
-  { year: 2015, fed_rate: 0.13, unrate: 5.28, cpi_yoy: 0.12,  retail_yoy:  2.01 },
-  { year: 2018, fed_rate: 1.83, unrate: 3.90, cpi_yoy: 2.44,  retail_yoy:  5.31 },
-  { year: 2019, fed_rate: 2.16, unrate: 3.67, cpi_yoy: 1.81,  retail_yoy:  3.79 },
-  { year: 2020, fed_rate: 0.36, unrate: 8.05, cpi_yoy: 1.23,  retail_yoy: -3.18 },
-  { year: 2021, fed_rate: 0.08, unrate: 5.35, cpi_yoy: 4.70,  retail_yoy: 17.62 },
-  { year: 2022, fed_rate: 1.68, unrate: 3.61, cpi_yoy: 8.00,  retail_yoy:  9.04 },
-  { year: 2023, fed_rate: 5.03, unrate: 3.62, cpi_yoy: 4.12,  retail_yoy:  2.21 },
-  { year: 2024, fed_rate: 5.33, unrate: 4.00, cpi_yoy: 2.90,  retail_yoy:  2.95 },
-];
-
-/* ------------------------------------------------------------------
-   Preset scenarios
------------------------------------------------------------------- */
-const PRESETS = {
-  soft:   { label: "Soft Landing", fed_rate: 4.0,  cpi: 2.5, unemp: 4.0  },
-  stag:   { label: "Stagflation",  fed_rate: 6.5,  cpi: 5.5, unemp: 5.5  },
-  rec:    { label: "Recession",    fed_rate: 2.0,  cpi: 1.5, unemp: 6.5  },
-};
-
-/* ------------------------------------------------------------------
-   Projection model
-   All inputs/outputs in percent (e.g. 4.5 means 4.5%)
------------------------------------------------------------------- */
-function runModel(fed_rate, cpi_input, unemp_input) {
-  // Okun-style approximation
-  let unemp_12mo = unemp_input + (fed_rate - 2.5) * 0.15;
-  unemp_12mo = clamp(unemp_12mo, 2.5, 12.0);
-
-  // CPI with rate drag and persistence
-  let cpi_12mo = cpi_input * 0.7 + fed_rate * -0.08;
-  cpi_12mo = clamp(cpi_12mo, -1.0, 10.0);
-
-  // Retail sales growth
-  let retail_growth = 2.8 - (unemp_12mo - 4.0) * 0.6;
-  retail_growth = clamp(retail_growth, -8.0, 12.0);
-
-  // Recession probability (logistic)
-  const z = -0.8 * (fed_rate - 5.0) + 0.4 * (unemp_12mo - 5.0);
-  let rec_prob = 1 / (1 + Math.exp(-z));
-  rec_prob = clamp(rec_prob, 0.01, 0.99);
-
-  return {
-    unemp_12mo:   round2(unemp_12mo),
-    cpi_12mo:     round2(cpi_12mo),
-    retail_growth: round2(retail_growth),
-    rec_prob:     Math.round(rec_prob * 100),
-  };
-}
-
-function clamp(val, min, max) {
-  return Math.max(min, Math.min(max, val));
-}
-
-function round2(val) {
-  return Math.round(val * 100) / 100;
-}
-
-function fmtPct(val, decimals = 2) {
-  return val.toFixed(decimals) + "%";
-}
+let currentModelMode = "calibrated"; // "calibrated" | "empirical"
 
 /* ------------------------------------------------------------------
    DOM refs
@@ -1050,6 +1159,11 @@ const projCpi    = document.getElementById("proj-cpi");
 const projRetail = document.getElementById("proj-retail");
 const projRec    = document.getElementById("proj-recprob");
 
+const ciUnemp  = document.getElementById("ci-unemp");
+const ciCpi    = document.getElementById("ci-cpi");
+const ciRetail = document.getElementById("ci-retail");
+const ciRec    = document.getElementById("ci-recprob");
+
 const barUnemp   = document.getElementById("bar-unemp");
 const barCpi     = document.getElementById("bar-cpi");
 const barRetail  = document.getElementById("bar-retail");
@@ -1064,6 +1178,56 @@ const currUnempLabel = document.getElementById("curr-unemp-label");
 const currCpiLabel   = document.getElementById("curr-cpi-label");
 const runBtn         = document.getElementById("run-btn");
 const compTableBody  = document.getElementById("comp-table-body");
+
+const btnModeCalibrated = document.getElementById("btn-mode-calibrated");
+const btnModeEmpirical  = document.getElementById("btn-mode-empirical");
+const valModeIndicator  = document.getElementById("val-mode-indicator");
+const modeDesc          = document.getElementById("mode-desc");
+
+const btnPresetSoft = document.getElementById("btn-preset-soft");
+const btnPresetStag = document.getElementById("btn-preset-stag");
+const btnPresetRec  = document.getElementById("btn-preset-rec");
+
+/* ------------------------------------------------------------------
+   Model Engine Mode Controller
+------------------------------------------------------------------ */
+function setModelMode(mode) {
+  currentModelMode = mode;
+  if (mode === "empirical") {
+    btnModeCalibrated.classList.remove("active");
+    btnModeEmpirical.classList.add("active");
+    valModeIndicator.textContent = "Empirical OLS (95% CI)";
+    valModeIndicator.style.color = "var(--green)";
+    modeDesc.textContent = "Data-estimated OLS regressions & MLE logit with 95% confidence bounds.";
+  } else {
+    btnModeEmpirical.classList.remove("active");
+    btnModeCalibrated.classList.add("active");
+    valModeIndicator.textContent = "Calibrated Policy";
+    valModeIndicator.style.color = "var(--amber)";
+    modeDesc.textContent = "Policy rule-of-thumb heuristics (Taylor/Okun baseline).";
+  }
+  updateProjections(true);
+}
+
+if (btnModeCalibrated) btnModeCalibrated.addEventListener("click", () => setModelMode("calibrated"));
+if (btnModeEmpirical)  btnModeEmpirical.addEventListener("click", () => setModelMode("empirical"));
+
+/* ------------------------------------------------------------------
+   Preset Loaders
+------------------------------------------------------------------ */
+function loadPreset(key) {
+  const p = PRESETS[key];
+  if (!p) return;
+  sliderFed.value = p.fed_rate;
+  sliderCpi.value = p.cpi;
+  sliderUnemp.value = p.unemp;
+  syncSliderLabels();
+  updateProjections(true);
+}
+
+if (btnPresetSoft) btnPresetSoft.addEventListener("click", () => loadPreset("soft"));
+if (btnPresetStag) btnPresetStag.addEventListener("click", () => loadPreset("stag"));
+if (btnPresetRec)  btnPresetRec.addEventListener("click", () => loadPreset("rec"));
 
 /* ------------------------------------------------------------------
    Slider display update (no model run)
@@ -1110,7 +1274,7 @@ function updateProjections(animate = false) {
   const cpi   = parseFloat(sliderCpi.value);
   const unemp = parseFloat(sliderUnemp.value);
 
-  const res = runModel(fed, cpi, unemp);
+  const res = runModel(fed, cpi, unemp, currentModelMode);
 
   // Unemployment card
   projUnemp.textContent = fmtPct(res.unemp_12mo);
@@ -1124,6 +1288,14 @@ function updateProjections(animate = false) {
     ? "var(--green)" : projUnemp.classList.contains("warn")
     ? "#facc15" : "var(--red)";
 
+  if (currentModelMode === "empirical") {
+    ciUnemp.textContent = "95% CI: [" + res.unemp_ci_lower.toFixed(2) + "% – " + res.unemp_ci_upper.toFixed(2) + "%] (SE: ±" + res.unemp_se.toFixed(2) + "%)";
+    ciUnemp.classList.add("active-ci");
+  } else {
+    ciUnemp.textContent = "Point estimate · Stylized rule";
+    ciUnemp.classList.remove("active-ci");
+  }
+
   // CPI card
   projCpi.textContent = fmtPct(res.cpi_12mo);
   applyColor(projCpi, res.cpi_12mo, {
@@ -1135,6 +1307,14 @@ function updateProjections(animate = false) {
   barCpi.style.background = projCpi.classList.contains("good")
     ? "var(--green)" : projCpi.classList.contains("warn")
     ? "#facc15" : "var(--red)";
+
+  if (currentModelMode === "empirical") {
+    ciCpi.textContent = "95% CI: [" + res.cpi_ci_lower.toFixed(2) + "% – " + res.cpi_ci_upper.toFixed(2) + "%] (SE: ±" + res.cpi_se.toFixed(2) + "%)";
+    ciCpi.classList.add("active-ci");
+  } else {
+    ciCpi.textContent = "Point estimate · Stylized rule";
+    ciCpi.classList.remove("active-ci");
+  }
 
   // Retail card
   projRetail.textContent = fmtPct(res.retail_growth);
@@ -1148,6 +1328,14 @@ function updateProjections(animate = false) {
     ? "var(--green)" : projRetail.classList.contains("warn")
     ? "#facc15" : "var(--red)";
 
+  if (currentModelMode === "empirical") {
+    ciRetail.textContent = "95% CI: [" + res.retail_ci_lower.toFixed(2) + "% – " + res.retail_ci_upper.toFixed(2) + "%] (SE: ±" + res.retail_se.toFixed(2) + "%)";
+    ciRetail.classList.add("active-ci");
+  } else {
+    ciRetail.textContent = "Point estimate · Stylized rule";
+    ciRetail.classList.remove("active-ci");
+  }
+
   // Recession probability card
   projRec.textContent = res.rec_prob + "%";
   applyColor(projRec, res.rec_prob, {
@@ -1158,6 +1346,14 @@ function updateProjections(animate = false) {
   barRec.style.background = projRec.classList.contains("good")
     ? "var(--green)" : projRec.classList.contains("warn")
     ? "#facc15" : "var(--red)";
+
+  if (currentModelMode === "empirical") {
+    ciRec.textContent = "Logit Score z = " + res.rec_z.toFixed(2) + " · MLE NBER fit";
+    ciRec.classList.add("active-ci");
+  } else {
+    ciRec.textContent = "Point estimate · Logistic anchor";
+    ciRec.classList.remove("active-ci");
+  }
 
   if (animate) {
     [cardUnemp, cardCpi, cardRetail, cardRecprob].forEach(flashCard);
@@ -1175,7 +1371,7 @@ function buildCompTable(currentRes) {
   // Compute projections for each preset
   const presetResults = {};
   for (const [key, preset] of Object.entries(PRESETS)) {
-    presetResults[key] = runModel(preset.fed_rate, preset.cpi, preset.unemp);
+    presetResults[key] = runModel(preset.fed_rate, preset.cpi, preset.unemp, currentModelMode);
   }
 
   const rows = [

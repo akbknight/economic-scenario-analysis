@@ -1,0 +1,19 @@
+{
+  "name": "economic-scenario-analysis",
+  "version": "1.0.0",
+  "description": "Interactive Macroeconomic Scenario Simulator with Empirical OLS Estimation and Uncertainty Bounds",
+  "main": "src/js/model.js",
+  "scripts": {
+    "test": "node tests/test_model_parity.cjs && py -3.14 tests/test_econometric_estimation.py",
+    "test:browser": "node tests/test_browser_smoke.cjs"
+  },
+  "keywords": [
+    "econometrics",
+    "macroeconomics",
+    "ols",
+    "scenario-analysis",
+    "fred-data"
+  ],
+  "author": "Akshay Kumar",
+  "license": "MIT"
+}
