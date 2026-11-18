@@ -32,7 +32,7 @@ def load_artifact():
         return json.load(f)
 
 def test_independent_recomputation_against_artifact():
-    """Independently recomputes Okun OLS from raw data and asserts against artifact."""
+    """Independently recomputes Contemporaneous Retail OLS from raw data and asserts against artifact."""
     artifact = load_artifact()
     expected_fit = artifact["ols_fits"]["retail_consumption"]
 
@@ -69,7 +69,7 @@ def test_independent_recomputation_against_artifact():
     assert abs(se_intercept - expected_fit["intercept_se"]) < 0.001
     assert abs(r2 - expected_fit["r_squared"]) < 0.001
     assert abs(t_stat - expected_fit["t_stat"]) < 0.001
-    print("  [PASS] Independent Okun OLS recomputation matches artifact exactly.")
+    print("  [PASS] Independent Contemporaneous Retail OLS recomputation matches artifact exactly.")
 
 def test_nonconsecutive_year_gaps():
     """Verifies that the 16 landmark years contain 4 multi-year gaps and only 11 consecutive pairs."""
@@ -141,10 +141,48 @@ def test_extreme_shock_clamping():
     assert len(LANDMARK_SNAPSHOTS) == 16
     print("  [PASS] Boundary condition clamping verified.")
 
+def test_logistic_diagnostic_and_component_classifications():
+    """Verifies that:
+    1. The logistic fit diagnostic documents ill-conditioning / separation on N=16.
+    2. Labor and inflation components are classified as illustrative assumptions (not fitted).
+    3. Retail OLS is empirically fitted, and documented as a contemporaneous association.
+    """
+    artifact = load_artifact()
+    comps = artifact["model_components"]
+
+    # 1. Retail OLS check
+    retail = comps["retail_consumption"]
+    assert retail["is_empirically_fitted"] is True
+    assert "Contemporaneous OLS" in retail["classification"]
+    assert "Not an identified causal policy effect" in retail["caveats"]
+
+    # 2. Labor policy assumption check
+    labor = comps["labor_market_transmission"]
+    assert labor["is_empirically_fitted"] is False
+    assert "Illustrative Policy Assumption" in labor["classification"]
+    assert "t_stat (2.141)" in labor["unsupported_claims_removed"]
+
+    # 3. Inflation AR-X heuristic check
+    infl = comps["inflation_persistence_drag"]
+    assert infl["is_empirically_fitted"] is False
+    assert "Illustrative Policy Assumption" in infl["classification"]
+    assert "p_val (<0.001 / 0.382)" in infl["unsupported_claims_removed"]
+
+    # 4. Recession diagnostic check
+    rec = comps["recession_indicator"]
+    assert rec["is_empirically_fitted"] is False
+    assert "Illustrative Macro Stress Scoring Index" in rec["classification"]
+    diag = rec["fit_diagnostic"]
+    assert diag["recession_events"] == 4
+    assert diag["sample_size"] == 16
+    assert "quasi-complete separation" in diag["conclusion"]
+    print("  [PASS] Component classification and logistic separation diagnostic verified.")
+
 if __name__ == "__main__":
     test_independent_recomputation_against_artifact()
     test_nonconsecutive_year_gaps()
     test_interval_distinctions()
     test_recession_class_distribution()
     test_extreme_shock_clamping()
-    print("\nALL INDEPENDENT RECOMPUTATION TESTS PASSED 100%!")
+    test_logistic_diagnostic_and_component_classifications()
+    print("\nALL 6 INDEPENDENT RECOMPUTATION & DIAGNOSTIC TESTS PASSED 100%!")

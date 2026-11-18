@@ -828,7 +828,7 @@
             </button>
           </div>
           <p class="control-desc" id="mode-desc" style="margin-top: 6px;">
-            Policy rule-of-thumb heuristics (Taylor/Okun baseline).
+            Policy rule-of-thumb heuristics (calibrated baseline).
           </p>
         </div>
 
@@ -900,7 +900,7 @@
         <p class="panel-title" style="margin-bottom:12px;">Model Notes</p>
         <ul style="list-style:none; display:flex; flex-direction:column; gap:8px;">
           <li style="font-size:11px; color:var(--text-dim); padding-left:12px; border-left:2px solid var(--border-2);">
-            Unemployment projection uses Okun-style approximation: each 1pp rise in the fed rate above 2.5% adds ~0.15pp to unemployment over 12 months.
+            Unemployment projection uses stylized policy sensitivity: each 1pp rise in the fed rate above 2.5% adds ~0.15pp to unemployment over 12 months.
           </li>
           <li style="font-size:11px; color:var(--text-dim); padding-left:12px; border-left:2px solid var(--border-2);">
             CPI projection applies a 30% pass-through persistence and an 8bp rate drag per 100bp of fed rate.
@@ -1018,12 +1018,13 @@
       <div>
         <h2 class="panel-title" style="margin-bottom:4px;">Econometric Parameter Estimation Architecture</h2>
         <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">
-          Estimated via Ordinary Least Squares (OLS) and Maximum Likelihood (Logit) on FRED annual macroeconomic series (2000–2024, N=16 benchmark regimes).
+          Contemporaneous retail relationship estimated via OLS on FRED landmark macroeconomic series (2000–2024, N=16). Labor transmission, inflation dynamics, and recession stress scoring are illustrative simulation assumptions.
         </p>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <span class="econ-badge sig">p &lt; 0.05 Statistically Significant</span>
-        <span class="econ-badge">95% Confidence Bounds (±1.96·SE)</span>
+        <span class="econ-badge sig">Empirically Fitted OLS (Retail YoY ~ UNRATE)</span>
+        <span class="econ-badge">Illustrative Policy Assumptions (Labor, Inflation, Recession)</span>
+        <span class="econ-badge">Conditional-Mean CI (±1.96·SE_mean)</span>
       </div>
     </div>
 
@@ -1031,56 +1032,51 @@
       <table class="comp-table" style="font-size:0.78rem;">
         <thead>
           <tr>
-            <th scope="col">Model / Dependent Variable</th>
+            <th scope="col">Model / Target Variable</th>
+            <th scope="col">Methodological Status</th>
             <th scope="col">Specification Formula</th>
-            <th scope="col">Estimated Parameter</th>
+            <th scope="col">Parameters / Baseline</th>
             <th scope="col">Std Error</th>
-            <th scope="col">t-stat / z</th>
-            <th scope="col">p-value</th>
-            <th scope="col">R² / Fit</th>
-            <th scope="col">95% Confidence Band</th>
+            <th scope="col">Estimation Diagnostics</th>
+            <th scope="col">Uncertainty &amp; Scope Caveats</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td class="row-label">Unemployment (12mo)</td>
+            <td><span class="econ-badge">Illustrative Policy Rule</span></td>
             <td class="mono">u_{12} = u_0 + \beta_r(r - 2.5)</td>
-            <td class="mono">\beta_r = +0.1520</td>
-            <td class="mono">0.0710</td>
-            <td class="mono">2.141</td>
-            <td class="mono"><span class="econ-badge sig">0.043*</span></td>
-            <td class="mono">0.170</td>
-            <td class="mono">\pm 1.96 \times \sqrt{s_0^2 + (\Delta r \cdot SE)^2}</td>
+            <td class="mono">\beta_r = +0.1500</td>
+            <td class="mono">s_0 = 0.12\%</td>
+            <td class="mono" style="color:var(--text-muted);">N/A — Assumed Heuristic (Unfitted; 4 multi-year gaps)</td>
+            <td class="mono">\pm 1.96 \times \sqrt{s_0^2 + (\Delta r \cdot SE)^2} (Illustrative parameter sensitivity)</td>
           </tr>
           <tr>
             <td class="row-label">CPI Inflation (12mo)</td>
+            <td><span class="econ-badge">Illustrative Sensitivity Heuristic</span></td>
             <td class="mono">\pi_{12} = \alpha + \beta_\pi \pi_0 + \beta_r r</td>
             <td class="mono">\beta_\pi = 0.6480, \beta_r = -0.0760</td>
-            <td class="mono">0.1420 / 0.0840</td>
-            <td class="mono">4.563 / -0.905</td>
-            <td class="mono"><span class="econ-badge sig">&lt;0.001*</span> / 0.382</td>
-            <td class="mono">s_e = 1.15%</td>
-            <td class="mono">\pm 1.96 \times s_e (\pm 2.25\%)</td>
+            <td class="mono">s_e = 1.15\%</td>
+            <td class="mono" style="color:var(--text-muted);">N/A — Assumed Heuristic (Unfitted; multi-year gaps violate lag-1 AR)</td>
+            <td class="mono">\pm 1.96 \times s_e (Illustrative sensitivity band)</td>
           </tr>
           <tr>
             <td class="row-label">Retail Sales Growth (12mo)</td>
+            <td><span class="econ-badge sig">Empirically Fitted OLS</span></td>
             <td class="mono">g_{ret} = \beta_0 + \beta_u \cdot u_{12}</td>
             <td class="mono">\beta_0 = 9.9077, \beta_u = -1.1000</td>
-            <td class="mono">3.880 / 0.680</td>
-            <td class="mono">2.554 / -1.618</td>
-            <td class="mono"><span class="econ-badge sig">0.023*</span> / 0.128</td>
-            <td class="mono">0.1575</td>
-            <td class="mono">\pm 1.96 \times s_e \sqrt{1/N + (u - \bar{u})^2 / SS_u}</td>
+            <td class="mono">3.8799 / 0.6800</td>
+            <td class="mono"><span class="econ-badge sig">t=2.554 (p=0.023*)</span> / t=-1.618 (p=0.128), R²=0.1575</td>
+            <td class="mono">\pm 1.96 \times s_e \sqrt{1/N + (u - \bar{u})^2 / SS_u} (Contemporaneous association; NOT a causal policy effect or validated forecast)</td>
           </tr>
           <tr>
-            <td class="row-label">Recession Probability (Logit)</td>
+            <td class="row-label">Recession Probability (Stress Index)</td>
+            <td><span class="econ-badge">Illustrative Scoring Index</span></td>
             <td class="mono">z = \beta_0 + \beta_r r + \beta_u u_{12}</td>
             <td class="mono">\beta_0 = -5.138, \beta_r = 0.126, \beta_u = 0.652</td>
-            <td class="mono">3.560 / 0.433 / 0.464</td>
-            <td class="mono">-1.44 / 0.29 / 1.41</td>
-            <td class="mono">0.149 / 0.772 / 0.160</td>
-            <td class="mono">Pseudo R² 0.198</td>
-            <td class="mono">P = 1 / (1 + e^{-z})</td>
+            <td class="mono" style="color:var(--text-muted);">N/A</td>
+            <td class="mono" style="color:var(--text-muted);">N/A — MLE Diverges (cond(H)=1.79e12; quasi-separation on 16 obs)</td>
+            <td class="mono">P = 1 / (1 + e^{-z}) (Monotonic stress index, NOT validated probability)</td>
           </tr>
         </tbody>
       </table>
@@ -1097,8 +1093,8 @@
         <p>Macroeconomic stress scenarios require sensitivity exploration across policy rates, inflation persistence, and labor slack rather than isolated static cases.</p>
       </div>
       <div class="method-item">
-        <h3>02 · Okun &amp; Policy Transmission</h3>
-        <p>Calibrated baseline applies stylized heuristics from macro literature (Taylor/Okun rules). Empirical prototype propagates OLS parameter uncertainty from historical FRED benchmark data (2000–2024).</p>
+        <h3>02 · Macro Sensitivity &amp; Contemporaneous Association</h3>
+        <p>Calibrated baseline applies stylized macro heuristics (Taylor monetary rules, baseline retail sensitivity). The empirical prototype fits a contemporaneous OLS association between retail sales growth and unemployment from FRED landmark data (2000–2024) with parameter uncertainty bands, while treating labor transmission and inflation persistence as illustrative simulation assumptions.</p>
       </div>
       <div class="method-item">
         <h3>03 · Landmark Snapshots &amp; Gap Scope</h3>
@@ -1204,7 +1200,7 @@ function setModelMode(mode) {
     btnModeCalibrated.classList.add("active");
     valModeIndicator.textContent = "Calibrated Policy";
     valModeIndicator.style.color = "var(--amber)";
-    modeDesc.textContent = "Policy rule-of-thumb heuristics (Taylor/Okun baseline).";
+    modeDesc.textContent = "Policy rule-of-thumb heuristics (calibrated baseline).";
   }
   updateProjections(true);
 }

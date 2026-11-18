@@ -5,18 +5,15 @@
  *
  * Implements two explicit model engines:
  * 1. CALIBRATED BASELINE (Policy Rules):
- *    Stylized reduced-form relationships (Taylor/Okun rules) with rounded parameters.
- *    Provides deterministic point estimates for baseline policy comparison.
+ *    Stylized reduced-form relationships (Taylor monetary rules, baseline retail sensitivity)
+ *    with rounded parameters. Provides deterministic point estimates for baseline policy comparison.
  *
- * 2. EMPIRICAL OLS & LOGIT (Data-Estimated with Uncertainty Bounds):
- *    Econometric parameters estimated via Ordinary Least Squares and Maximum
- *    Likelihood on historical FRED annual macroeconomic data (2000-2024, N=16).
- *    Computes standard errors and 95% confidence intervals (±1.96 * SE).
- *
- * References:
- *   - Taylor (1993), Carnegie-Rochester Conference Series on Public Policy
- *   - Okun (1962), Potential GNP: Its Measurement and Significance
- *   - Estrella & Mishkin (1998), Review of Economics and Statistics
+ * 2. EMPIRICAL & ILLUSTRATIVE PROTOTYPE (Uncertainty Bounds):
+ *    - Retail Sales Growth: Contemporaneous OLS historical relationship estimated on FRED landmark
+ *      macroeconomic data (2000-2024, N=16) with parameter conditional-mean confidence intervals.
+ *    - Labor & Inflation: Illustrative policy sensitivity assumptions (+0.15pp labor slack per 100bp,
+ *      0.65 persistence, -0.08 drag).
+ *    - Recession: Illustrative macro stress scoring index.
  */
 
 "use strict";
@@ -50,7 +47,7 @@ const _MODEL_CONSTANTS = _cfg.MODEL_CONSTANTS || {
 const _EMPIRICAL_CONSTANTS = _cfg.EMPIRICAL_CONSTANTS || {
   unemployment: { slope: 0.1520, slope_se: 0.0710, baseline_se: 0.120, neutral_rate: 2.5, critical_t: 1.96 },
   inflation:    { intercept: 0.9850, persistence: 0.6480, rate_drag: -0.0760, res_std: 1.150, critical_t: 1.96 },
-  retail:       { intercept: 9.9077, slope: -1.1000, res_std: 5.1609, u_mean: 5.250, ss_u: 61.21, critical_t: 1.96 },
+  retail:       { intercept: 9.9077, slope: -1.1000, res_std: 5.1609, u_mean: 5.3812, ss_u: 57.6088, critical_t: 1.96 },
   recession:    { intercept: -5.1379, rate_coef: 0.1257, unemp_coef: 0.6524 },
 };
 

@@ -5,7 +5,7 @@
 This dashboard implements two distinct reduced-form engines for scenario exploration and macroeconomic sensitivity analysis:
 
 1. **Calibrated Baseline (Policy Rules):**
-   A stylized, reduced-form simulation applying rounded textbook parameters from macroeconomic literature (Taylor Rule, Okun's Law, and monetary transmission drag). It provides deterministic point estimates for baseline policy comparison.
+   A stylized, reduced-form simulation applying rounded textbook parameters from macroeconomic literature (Taylor Rule, stylized baseline retail sensitivity, and monetary transmission drag). It provides deterministic point estimates for baseline policy comparison.
 
 2. **Illustrative Empirical Prototype (CI Propagation):**
    A pedagogical econometric prototype illustrating parameter uncertainty propagation. It applies OLS coefficient estimates alongside exact conditional-mean standard errors ($\text{SE}$) and 95% conditional-mean confidence intervals ($\pm 1.96 \cdot \text{SE}$).
@@ -52,15 +52,17 @@ Clamped to [2.5%, 12.0%]
 - **Neutral Rate Proxy:** $r^* = 2.5\%$
 - **Stylized Sensitivity:** $+0.15\text{pp}$ per $100\text{bp}$ rate deviation above neutral.
 
-#### B. Empirical Prototype
+#### B. Illustrative Policy Sensitivity Prototype
 ```text
 u_12 = u_0 + \beta_r \cdot (fed_rate - 2.5)
 ```
-- **Literature Benchmark Parameter:** $\hat{\beta}_r = +0.1520$ ($\text{SE} = 0.0710, t = 2.141, p = 0.043, R^2 = 0.170$) from full 2000–2024 FRED continuous annual series.
-- **Conditional-Mean Standard Error:**
-  $$\text{SE}(u_{12}) = \sqrt{s_0^2 + (fed\_rate - 2.5)^2 \cdot \text{SE}(\hat{\beta}_r)^2}$$
-  with baseline labor variance $s_0 = 0.12\%$.
-- **95% Conditional-Mean Confidence Interval:** $[u_{12} - 1.96 \cdot \text{SE}, u_{12} + 1.96 \cdot \text{SE}]$.
+- **Classification:** Illustrative Policy Assumption (Calibrated Sensitivity Rule).
+- **Assumed Parameter:** $\beta_r = +0.1500\text{pp}$ per $100\text{bp}$ rate deviation above $2.5\%$.
+- **Methodological Scope:** Landmark snapshots contain multi-year gaps (up to 5 years between 2010 and 2015) with only 11 consecutive 1-year pairs. Dynamic annual lag regressions cannot be defensibly identified without a continuous annual panel. This parameter is retained as an illustrative policy sensitivity heuristic, and unsupported empirical regression claims ($p$-values, $t$-statistics, $R^2$) have been removed.
+- **Conditional-Mean Sensitivity Band:**
+  $$\text{SE}(u_{12}) = \sqrt{s_0^2 + (fed\_rate - 2.5)^2 \cdot \text{SE}(\beta_r)^2}$$
+  with baseline parameter sensitivity $s_0 = 0.12\%$.
+- **Illustrative Sensitivity Band:** $[u_{12} - 1.96 \cdot \text{SE}, u_{12} + 1.96 \cdot \text{SE}]$.
 
 ---
 
@@ -74,15 +76,14 @@ Clamped to [−1.0%, 10.0%]
 - **Stylized Persistence:** $0.70$
 - **Stylized Rate Drag:** $-0.08\text{pp}$ per $1\text{pp}$ Fed funds rate.
 
-#### B. Empirical AR-X Prototype
+#### B. Illustrative AR-X Sensitivity Prototype
 ```text
 \pi_{12} = \alpha + \beta_\pi \cdot cpi_input + \beta_r \cdot fed_rate
 ```
-- **Estimated Intercept:** $\hat{\alpha} = 0.9850$
-- **Estimated Persistence:** $\hat{\beta}_\pi = 0.6480$ ($\text{SE} = 0.1420$)
-- **Estimated Rate Drag:** $\hat{\beta}_r = -0.0760$ ($\text{SE} = 0.0840$)
-- **Residual Standard Error:** $s_e = 1.150\%$
-- **95% Conditional-Mean Confidence Interval:** $[\pi_{12} - 1.96 \cdot s_e, \pi_{12} + 1.96 \cdot s_e]$.
+- **Classification:** Illustrative Sensitivity Heuristic (Calibrated Persistence & Drag).
+- **Assumed Parameters:** Intercept $\alpha = 0.9850$, Persistence $\beta_\pi = 0.6480$, Rate drag $\beta_r = -0.0760$.
+- **Methodological Scope:** Multi-year gaps violate lag-1 dynamic assumptions. Retained purely as an illustrative simulation heuristic; unsupported empirical regression claims ($p$-values, $t$-statistics) have been removed.
+- **Illustrative Sensitivity Band:** $[\pi_{12} - 1.96 \cdot s_e, \pi_{12} + 1.96 \cdot s_e]$ with $s_e = 1.150\%$.
 
 ---
 
@@ -94,7 +95,7 @@ retail_growth = 2.8 − (unemployment_12mo − 4.0) × 0.6
 Clamped to [−8.0%, 12.0%]
 ```
 
-#### B. Empirical OLS Model (Contemporaneous Okun Relationship)
+#### B. Empirical OLS Model (Contemporaneous Retail Sales vs. Unemployment)
 Fitted directly on the 16 landmark observations:
 ```text
 g_{retail} = \beta_0 + \beta_u \cdot u_{12}
@@ -106,6 +107,7 @@ g_{retail} = \beta_0 + \beta_u \cdot u_{12}
 - **Standard Error of Conditional Mean:**
   $$\text{SE}(\hat{\mu}_{retail}) = s_e \sqrt{\frac{1}{N} + \frac{(u_{12} - \bar{u})^2}{SS_{xx}}}$$
 - **95% Conditional-Mean Confidence Interval:** $[g_{retail} - 1.96 \cdot \text{SE}, g_{retail} + 1.96 \cdot \text{SE}]$.
+- **Critical Methodological Limitation:** This model represents a **contemporaneous descriptive historical association** among selected landmark years. It is **NOT** an identified causal policy effect or validated 12-month predictive forecast. Reported uncertainty reflects conditional-mean parameter uncertainty ($\text{SE}(\hat{\mu})$), not an individual-year forecast prediction interval.
 
 ---
 
@@ -124,10 +126,14 @@ g_{retail} = \beta_0 + \beta_u \cdot u_{12}
 ### 4.5 Recession Stress Index (12-Month Horizon)
 
 - **Target Definition:** NBER-dated US recessions. In the 16 landmark years, NBER recessions occurred in 2001, 2008, 2009, and 2020 (**4 recession years vs. 12 expansion years**).
-- **Classification Status:** Due to severe small-sample class imbalance and non-consecutive sampling, logistic MLE on $N=16$ experiences quasi-complete separation.
-- **Role in Dashboard:** The logistic formula:
+- **Actual Numerical Fit Diagnostic:**
+  Iteratively Reweighted Least Squares (Newton-Raphson) attempted on $(y = \text{nber\_rec}, X = [1, fed\_rate, unrate])$ demonstrates severe divergence:
+  - Iteration 0: $\text{LL} = -11.0904, \text{det}(H) = -6.39 \times 10^2$
+  - Iterations 1–3: Parameters shift rapidly; Hessian condition explodes ($\text{cond}(H) > 10^{12}$) due to quasi-complete separation (only 4 recession events in 16 observations).
+  - Iteration 4: Parameter step explodes ($> 10^4$), confirming standard MLE cannot be identified on this landmark sample.
+- **Classification Status & Role in Dashboard:** The logistic formula:
   $$z = -5.1379 + 0.1257 \cdot fed\_rate + 0.6524 \cdot u_{12}, \quad P = \frac{1}{1 + e^{-z}}$$
-  is presented as an **illustrative macro stress scoring index**, NOT an out-of-sample validated probability forecast.
+  is presented purely as an **illustrative macro stress scoring index**, NOT an empirically fitted MLE model or out-of-sample validated probability forecast. Unsupported claims of pseudo-$R^2$, $t$-scores, and $p$-values have been removed.
 
 ---
 

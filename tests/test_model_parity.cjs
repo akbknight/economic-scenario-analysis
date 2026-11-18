@@ -68,9 +68,9 @@ assert.strictEqual(empDef.cpi_ci_lower, 0.46);
 assert.strictEqual(empDef.cpi_ci_upper, 4.97);
 
 assert.strictEqual(empDef.retail_growth, 5.07);
-assert.strictEqual(empDef.retail_se, 1.41);
-assert.strictEqual(empDef.retail_ci_lower, 2.31);
-assert.strictEqual(empDef.retail_ci_upper, 7.83);
+assert.strictEqual(empDef.retail_se, 1.45);
+assert.strictEqual(empDef.retail_ci_lower, 2.22);
+assert.strictEqual(empDef.retail_ci_upper, 7.91);
 
 assert.strictEqual(empDef.rec_prob, 15);
 console.log("  [PASS] Empirical OLS default output verified with exact 95% CI bounds");

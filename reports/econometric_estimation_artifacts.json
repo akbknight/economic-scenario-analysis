@@ -39,7 +39,8 @@
   },
   "ols_fits": {
     "retail_consumption": {
-      "model": "Retail Sales YoY ~ Unemployment Rate (Contemporaneous Okun OLS)",
+      "model": "Retail Sales YoY ~ Unemployment Rate (Contemporaneous OLS)",
+      "role": "Contemporaneous descriptive historical association among landmark years. NOT an identified causal policy effect or validated 12-month predictive forecast.",
       "n": 16,
       "df_resid": 14,
       "x_mean": 5.3812,
@@ -54,11 +55,178 @@
       "residual_std_error": 5.1609
     }
   },
+  "model_components": {
+    "retail_consumption": {
+      "classification": "Empirically Fitted Contemporaneous OLS",
+      "is_empirically_fitted": true,
+      "fit_results": {
+        "model": "Retail Sales YoY ~ Unemployment Rate (Contemporaneous OLS)",
+        "role": "Contemporaneous descriptive historical association among landmark years. NOT an identified causal policy effect or validated 12-month predictive forecast.",
+        "n": 16,
+        "df_resid": 14,
+        "x_mean": 5.3812,
+        "y_mean": 3.9881,
+        "ss_xx": 57.6088,
+        "intercept": 9.9077,
+        "intercept_se": 3.8799,
+        "slope": -1.1,
+        "slope_se": 0.68,
+        "t_stat": -1.6178,
+        "r_squared": 0.1575,
+        "residual_std_error": 5.1609
+      },
+      "caveats": "Contemporaneous descriptive association. Not an identified causal policy effect or validated 12-month forecast."
+    },
+    "labor_market_transmission": {
+      "classification": "Illustrative Policy Assumption / Calibrated Sensitivity Rule",
+      "is_empirically_fitted": false,
+      "assumed_parameters": {
+        "slope": 0.15,
+        "neutral_rate": 2.5,
+        "interpretation": "+0.15pp unemployment per 100bps Fed Funds rate deviation above 2.5%"
+      },
+      "rationale": "Non-consecutive landmark years contain multi-year gaps (up to 5 years between 2010 and 2015) with only 11 consecutive 1-year pairs. Dynamic annual lag regressions cannot be defensibly identified without a continuous annual panel. Retained as an illustrative policy sensitivity heuristic.",
+      "unsupported_claims_removed": [
+        "t_stat (2.141)",
+        "p_val (0.043)",
+        "r_squared (0.170)",
+        "empirical OLS claim"
+      ]
+    },
+    "inflation_persistence_drag": {
+      "classification": "Illustrative Policy Assumption / Calibrated AR-X Sensitivity",
+      "is_empirically_fitted": false,
+      "assumed_parameters": {
+        "persistence": 0.648,
+        "rate_drag": -0.076,
+        "intercept": 0.985,
+        "interpretation": "Fraction 0.65 inflation persistence carried forward minus 0.08pp drag per 1pp Fed rate"
+      },
+      "rationale": "Multi-year gaps violate lag-1 dynamic assumptions. Retained as an illustrative simulation heuristic.",
+      "unsupported_claims_removed": [
+        "t_stat (4.563 / -0.905)",
+        "p_val (<0.001 / 0.382)",
+        "empirical AR-X regression claim"
+      ]
+    },
+    "recession_indicator": {
+      "classification": "Illustrative Macro Stress Scoring Index",
+      "is_empirically_fitted": false,
+      "assumed_parameters": {
+        "intercept": -5.1379,
+        "rate_coef": 0.1257,
+        "unemp_coef": 0.6524
+      },
+      "fit_diagnostic": {
+        "diagnostic_title": "Logistic MLE Separation Diagnostic on Landmark Snapshots",
+        "sample_size": 16,
+        "recession_events": 4,
+        "expansion_events": 12,
+        "iteration_log": [
+          {
+            "iteration": 0,
+            "beta": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "log_likelihood": -11.0904,
+            "hessian_determinant": "-6.3926e+02",
+            "abs_det": 639.2553489387519
+          },
+          {
+            "iteration": 1,
+            "beta": [
+              -3.8278,
+              0.0727,
+              0.4916
+            ],
+            "log_likelihood": -7.3751,
+            "hessian_determinant": "-2.0975e+02",
+            "abs_det": 209.75216334957076
+          },
+          {
+            "iteration": 2,
+            "beta": [
+              -4.9407,
+              0.1144,
+              0.6289
+            ],
+            "log_likelihood": -7.2225,
+            "hessian_determinant": "-1.2072e+02",
+            "abs_det": 120.7208734211963
+          },
+          {
+            "iteration": 3,
+            "beta": [
+              -5.1328,
+              0.1253,
+              0.6518
+            ],
+            "log_likelihood": -7.2199,
+            "hessian_determinant": "-1.1057e+02",
+            "abs_det": 110.56586458680567
+          },
+          {
+            "iteration": 4,
+            "beta": [
+              -5.1379,
+              0.1257,
+              0.6524
+            ],
+            "log_likelihood": -7.2199,
+            "hessian_determinant": "-1.1035e+02",
+            "abs_det": 110.34745799417533
+          },
+          {
+            "iteration": 5,
+            "beta": [
+              -5.1379,
+              0.1257,
+              0.6524
+            ],
+            "log_likelihood": -7.2199,
+            "hessian_determinant": "-1.1035e+02",
+            "abs_det": 110.34733228165169
+          },
+          {
+            "iteration": 6,
+            "beta": [
+              -5.1379,
+              0.1257,
+              0.6524
+            ],
+            "log_likelihood": -7.2199,
+            "hessian_determinant": "-1.1035e+02",
+            "abs_det": 110.34733228160121
+          },
+          {
+            "iteration": 7,
+            "beta": [
+              -5.1379,
+              0.1257,
+              0.6524
+            ],
+            "log_likelihood": -7.2199,
+            "hessian_determinant": "-1.1035e+02",
+            "abs_det": 110.34733228160076
+          }
+        ],
+        "conclusion": "Standard logistic MLE diverges due to quasi-complete separation. The recession scoring formula is therefore retained purely as an illustrative heuristic stress index, NOT an empirically fitted or validated probability model."
+      },
+      "unsupported_claims_removed": [
+        "pseudo_r2 (0.198)",
+        "p_vals",
+        "t_stats",
+        "validated probability claim"
+      ]
+    }
+  },
   "methodological_distinctions": {
     "parameter_uncertainty": "SE(beta) describes sampling standard deviation of coefficient estimators.",
     "conditional_mean_interval": "mu_hat(x) +- t * s_e * sqrt(1/n + (x - x_bar)^2 / SS_xx). Uncertainty of the expected average response.",
     "forecast_prediction_interval": "y_new +- t * s_e * sqrt(1 + 1/n + (x - x_bar)^2 / SS_xx). Substantially wider due to individual residual variance s_e^2.",
-    "recession_logit_classification": "Illustrative macro stress scoring formula. With only 4 recession events in N=16 non-consecutive years, it is NOT an out-of-sample validated probability model.",
+    "recession_scoring_classification": "Illustrative macro stress scoring formula. With only 4 recession events in N=16 non-consecutive years, it is NOT an out-of-sample validated probability model.",
     "lag_structure_limitation": "Multi-year gaps (up to 5 years between 2010 and 2015) violate uniform annual lag assumptions (t -> t+1). Continuous annual series is required for valid dynamic lag estimation."
   }
 }

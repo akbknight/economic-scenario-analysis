@@ -56,7 +56,7 @@ const MODEL_CONSTANTS = {
   /** Retail baseline growth (%) — long-run average advance retail YoY */
   RETAIL_BASELINE: 2.8,
 
-  /** Retail-unemployment sensitivity from Okun's Law variant
+  /** Retail-unemployment sensitivity heuristic
    *  Each 1pp rise in unemployment above 4.0% → -0.6pp retail growth. */
   RETAIL_UNEMP_SENSITIVITY: 0.6,
 
@@ -72,63 +72,65 @@ const MODEL_CONSTANTS = {
 };
 
 /* ============================================================
-   EMPIRICAL ECONOMETRIC ESTIMATION CONSTANTS (DATA-ESTIMATED)
-   Formally estimated via OLS and Maximum Likelihood Logit on the
-   historical FRED macroeconomic dataset (2000-2024, N=16 benchmark regimes).
+   EMPIRICAL & ILLUSTRATIVE CONSTANTS (PROTOTYPE ENGINE)
+   Contains the empirically fitted contemporaneous retail OLS model
+   alongside illustrative calibrated sensitivity rules for labor,
+   inflation, and recession stress scoring.
    ============================================================ */
 
 const EMPIRICAL_CONSTANTS = {
   unemployment: {
     name: "Labor Market Policy Transmission",
+    classification: "Illustrative Policy Assumption / Calibrated Sensitivity Rule",
+    is_empirically_fitted: false,
     specification: "u_{12} = u_0 + \\beta_r \\cdot (r - 2.5)",
     slope: 0.1520,
     slope_se: 0.0710,
-    t_stat: 2.141,
-    p_val: 0.043,
-    r_squared: 0.170,
     baseline_se: 0.120,
     neutral_rate: 2.5,
-    df_resid: 14,
     critical_t: 1.96,
+    note: "Stylized sensitivity assumption (+0.15pp per 100bps rate deviation above 2.5%). Not estimated via dynamic OLS due to multi-year gaps.",
   },
   inflation: {
-    name: "Phillips Curve Monetary Transmission (AR-X)",
+    name: "Inflation Persistence & Rate Drag (AR-X Structure)",
+    classification: "Illustrative Sensitivity Heuristic / Calibrated Persistence & Drag",
+    is_empirically_fitted: false,
     specification: "\\pi_{12} = \\alpha + \\beta_\\pi \\cdot \\pi_0 + \\beta_r \\cdot r",
     intercept: 0.9850,
     persistence: 0.6480,
-    persistence_se: 0.1420,
     rate_drag: -0.0760,
-    rate_drag_se: 0.0840,
     res_std: 1.150,
-    df_resid: 13,
     critical_t: 1.96,
+    note: "Stylized persistence and rate drag assumptions. Not estimated via dynamic AR-X due to multi-year gaps.",
   },
   retail: {
-    name: "Okun's Law Consumption Relationship (OLS)",
+    name: "Retail Sales Growth vs. Unemployment (Contemporaneous OLS)",
+    classification: "Empirically Fitted Contemporaneous OLS",
+    is_empirically_fitted: true,
     specification: "g_{retail} = \\beta_0 + \\beta_u \\cdot u_{12}",
     intercept: 9.9077,
-    intercept_se: 3.880,
+    intercept_se: 3.8799,
     slope: -1.1000,
     slope_se: 0.6800,
     t_stat: -1.618,
     p_val: 0.128,
     r_squared: 0.1575,
     res_std: 5.1609,
-    u_mean: 5.250,
-    ss_u: 61.21,
+    u_mean: 5.3812,
+    ss_u: 57.6088,
     df_resid: 14,
     critical_t: 1.96,
+    note: "Contemporaneous descriptive historical association among landmark years (N=16). Not an identified causal policy effect or validated 12-month forecast.",
   },
   recession: {
-    name: "Empirical Logit Recession Classifier",
+    name: "Illustrative Macro Stress Scoring Index",
+    classification: "Illustrative Macro Stress Scoring Index",
+    is_empirically_fitted: false,
     specification: "z = \\beta_0 + \\beta_r \\cdot r + \\beta_u \\cdot u_{12}; P = 1/(1+e^{-z})",
     intercept: -5.1379,
-    intercept_se: 3.560,
     rate_coef: 0.1257,
-    rate_se: 0.433,
     unemp_coef: 0.6524,
-    unemp_se: 0.464,
-    pseudo_r2: 0.1976,
+    note: "Stylized scoring formula. Quasi-complete separation on 16 observations (4 recession years) prevents valid MLE identification.",
   },
 };
 
