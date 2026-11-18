@@ -1,0 +1,64 @@
+{
+  "dataset": {
+    "description": "Selected Landmark Historical Macroeconomic Snapshots (2000-2024)",
+    "role": "Comparative chart benchmarks & pedagogical parameter uncertainty illustration",
+    "total_observations": 16,
+    "consecutive_annual_pairs": 11,
+    "nonconsecutive_gaps": [
+      {
+        "from_year": 2001,
+        "to_year": 2003,
+        "gap_years": 2
+      },
+      {
+        "from_year": 2003,
+        "to_year": 2006,
+        "gap_years": 3
+      },
+      {
+        "from_year": 2010,
+        "to_year": 2015,
+        "gap_years": 5
+      },
+      {
+        "from_year": 2015,
+        "to_year": 2018,
+        "gap_years": 3
+      }
+    ],
+    "nber_recession_years": [
+      2001,
+      2008,
+      2009,
+      2020
+    ],
+    "class_distribution": {
+      "recession_count": 4,
+      "expansion_count": 12
+    }
+  },
+  "ols_fits": {
+    "retail_consumption": {
+      "model": "Retail Sales YoY ~ Unemployment Rate (Contemporaneous Okun OLS)",
+      "n": 16,
+      "df_resid": 14,
+      "x_mean": 5.3812,
+      "y_mean": 3.9881,
+      "ss_xx": 57.6088,
+      "intercept": 9.9077,
+      "intercept_se": 3.8799,
+      "slope": -1.1,
+      "slope_se": 0.68,
+      "t_stat": -1.6178,
+      "r_squared": 0.1575,
+      "residual_std_error": 5.1609
+    }
+  },
+  "methodological_distinctions": {
+    "parameter_uncertainty": "SE(beta) describes sampling standard deviation of coefficient estimators.",
+    "conditional_mean_interval": "mu_hat(x) +- t * s_e * sqrt(1/n + (x - x_bar)^2 / SS_xx). Uncertainty of the expected average response.",
+    "forecast_prediction_interval": "y_new +- t * s_e * sqrt(1 + 1/n + (x - x_bar)^2 / SS_xx). Substantially wider due to individual residual variance s_e^2.",
+    "recession_logit_classification": "Illustrative macro stress scoring formula. With only 4 recession events in N=16 non-consecutive years, it is NOT an out-of-sample validated probability model.",
+    "lag_structure_limitation": "Multi-year gaps (up to 5 years between 2010 and 2015) violate uniform annual lag assumptions (t -> t+1). Continuous annual series is required for valid dynamic lag estimation."
+  }
+}

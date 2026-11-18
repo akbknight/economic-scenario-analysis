@@ -824,7 +824,7 @@
               Calibrated Baseline
             </button>
             <button type="button" class="mode-toggle-btn" id="btn-mode-empirical" data-mode="empirical">
-              Empirical OLS (95% CI)
+              Illustrative Empirical (CI Prototype)
             </button>
           </div>
           <p class="control-desc" id="mode-desc" style="margin-top: 6px;">
@@ -1090,23 +1090,23 @@
   
   <!-- Methodological Architecture -->
   <div class="methodology-panel">
-    <h2 class="panel-title">Econometric Model Framework &amp; Empirical Calibration</h2>
+    <h2 class="panel-title">Econometric Model Framework &amp; Illustrative Calibration</h2>
     <div class="method-grid">
       <div class="method-item">
         <h3>01 · Problem Statement</h3>
-        <p>Macroeconomic stress scenarios require continuous forward projections across monetary policy pivots, inflation persistence, and labor market frictions rather than discrete static cases.</p>
+        <p>Macroeconomic stress scenarios require sensitivity exploration across policy rates, inflation persistence, and labor slack rather than isolated static cases.</p>
       </div>
       <div class="method-item">
-        <h3>02 · Okun &amp; Phillips Specifications</h3>
-        <p>Applies empirical coefficients calibrated against 2000–2024 annual FRED averages: fed funds rate drag on CPI (8bp per 100bp rate hike with 30% persistence), and Okun-style labor slack transmission (+0.15pp unemployment above 2.5% neutral rate).</p>
+        <h3>02 · Okun &amp; Policy Transmission</h3>
+        <p>Calibrated baseline applies stylized heuristics from macro literature (Taylor/Okun rules). Empirical prototype propagates OLS parameter uncertainty from historical FRED benchmark data (2000–2024).</p>
       </div>
       <div class="method-item">
-        <h3>03 · Logistic Shock Probability</h3>
-        <p>Recession probability uses a calibrated logistic response function z = &minus;0.8(r &minus; 5.0) + 0.4(u &minus; 5.0) measuring yield inversion tension and labor deceleration.</p>
+        <h3>03 · Landmark Snapshots &amp; Gap Scope</h3>
+        <p>The 16 historical years (2000–2024) are selected landmark benchmark snapshots illustrating cyclical extremes, not a continuous annual estimation panel. Gaps of 2 to 5 years are documented and excluded from uniform 1-year lag specifications.</p>
       </div>
       <div class="method-item">
-        <h3>04 · Limitations &amp; Bounds</h3>
-        <p>Simplified structural simulation assuming ceteris paribus exogenous conditions. Does not model sudden fiscal stimulus or geopolitical commodity shocks autonomously.</p>
+        <h3>04 · Confidence vs. Prediction Intervals</h3>
+        <p>Reported uncertainty bands represent conditional-mean confidence intervals (&plusmn;1.96·SE of expected response). Forecast prediction intervals for individual years are substantially wider due to irreducible residual variance.</p>
       </div>
     </div>
   </div>
@@ -1196,9 +1196,9 @@ function setModelMode(mode) {
   if (mode === "empirical") {
     btnModeCalibrated.classList.remove("active");
     btnModeEmpirical.classList.add("active");
-    valModeIndicator.textContent = "Empirical OLS (95% CI)";
+    valModeIndicator.textContent = "Illustrative Empirical (CI Prototype)";
     valModeIndicator.style.color = "var(--green)";
-    modeDesc.textContent = "Data-estimated OLS regressions & MLE logit with 95% confidence bounds.";
+    modeDesc.textContent = "Illustrative OLS parameter uncertainty & conditional-mean confidence bounds.";
   } else {
     btnModeEmpirical.classList.remove("active");
     btnModeCalibrated.classList.add("active");
@@ -1289,7 +1289,7 @@ function updateProjections(animate = false) {
     ? "#facc15" : "var(--red)";
 
   if (currentModelMode === "empirical") {
-    ciUnemp.textContent = "95% CI: [" + res.unemp_ci_lower.toFixed(2) + "% – " + res.unemp_ci_upper.toFixed(2) + "%] (SE: ±" + res.unemp_se.toFixed(2) + "%)";
+    ciUnemp.textContent = "95% Mean CI: [" + res.unemp_ci_lower.toFixed(2) + "% – " + res.unemp_ci_upper.toFixed(2) + "%] (SE: ±" + res.unemp_se.toFixed(2) + "%)";
     ciUnemp.classList.add("active-ci");
   } else {
     ciUnemp.textContent = "Point estimate · Stylized rule";
@@ -1309,7 +1309,7 @@ function updateProjections(animate = false) {
     ? "#facc15" : "var(--red)";
 
   if (currentModelMode === "empirical") {
-    ciCpi.textContent = "95% CI: [" + res.cpi_ci_lower.toFixed(2) + "% – " + res.cpi_ci_upper.toFixed(2) + "%] (SE: ±" + res.cpi_se.toFixed(2) + "%)";
+    ciCpi.textContent = "95% Mean CI: [" + res.cpi_ci_lower.toFixed(2) + "% – " + res.cpi_ci_upper.toFixed(2) + "%] (SE: ±" + res.cpi_se.toFixed(2) + "%)";
     ciCpi.classList.add("active-ci");
   } else {
     ciCpi.textContent = "Point estimate · Stylized rule";
@@ -1329,7 +1329,7 @@ function updateProjections(animate = false) {
     ? "#facc15" : "var(--red)";
 
   if (currentModelMode === "empirical") {
-    ciRetail.textContent = "95% CI: [" + res.retail_ci_lower.toFixed(2) + "% – " + res.retail_ci_upper.toFixed(2) + "%] (SE: ±" + res.retail_se.toFixed(2) + "%)";
+    ciRetail.textContent = "95% Mean CI: [" + res.retail_ci_lower.toFixed(2) + "% – " + res.retail_ci_upper.toFixed(2) + "%] (SE: ±" + res.retail_se.toFixed(2) + "%)";
     ciRetail.classList.add("active-ci");
   } else {
     ciRetail.textContent = "Point estimate · Stylized rule";
@@ -1348,7 +1348,7 @@ function updateProjections(animate = false) {
     ? "#facc15" : "var(--red)";
 
   if (currentModelMode === "empirical") {
-    ciRec.textContent = "Logit Score z = " + res.rec_z.toFixed(2) + " · MLE NBER fit";
+    ciRec.textContent = "Stress Index z = " + res.rec_z.toFixed(2) + " · Illustrative Logit Metric";
     ciRec.classList.add("active-ci");
   } else {
     ciRec.textContent = "Point estimate · Logistic anchor";

@@ -131,12 +131,12 @@ async function runBrowserSmokeTest() {
     assert.strictEqual(empiricalValues.cpi, "2.72%");
     assert.strictEqual(empiricalValues.retail, "5.07%");
     assert.strictEqual(empiricalValues.rec, "15%");
-    assert.ok(empiricalValues.ciUnemp.includes("95% CI: [4.04%"), `CI unemp must contain bounds, got ${empiricalValues.ciUnemp}`);
-    assert.ok(empiricalValues.ciCpi.includes("95% CI: [0.46%"), `CI cpi must contain bounds, got ${empiricalValues.ciCpi}`);
-    assert.ok(empiricalValues.ciRetail.includes("95% CI: [2.31%"), `CI retail must contain bounds, got ${empiricalValues.ciRetail}`);
+    assert.ok(empiricalValues.ciUnemp.includes("Mean CI: [4.04%"), `CI unemp must contain bounds, got ${empiricalValues.ciUnemp}`);
+    assert.ok(empiricalValues.ciCpi.includes("Mean CI: [0.46%"), `CI cpi must contain bounds, got ${empiricalValues.ciCpi}`);
+    assert.ok(empiricalValues.ciRetail.includes("Mean CI: [2.31%"), `CI retail must contain bounds, got ${empiricalValues.ciRetail}`);
     assert.strictEqual(empiricalValues.hasActiveCi, true);
-    assert.ok(empiricalValues.modeLabel.includes("Empirical OLS"));
-    console.log("  [PASS] Switched to Empirical OLS mode: point estimates and 95% confidence intervals rendered to DOM");
+    assert.ok(empiricalValues.modeLabel.includes("Illustrative Empirical"));
+    console.log("  [PASS] Switched to Illustrative Empirical mode: point estimates and conditional-mean confidence intervals rendered to DOM");
 
     // 5. Test slider interaction
     await page.evaluate(() => {
