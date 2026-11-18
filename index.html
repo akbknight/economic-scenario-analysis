@@ -1018,12 +1018,12 @@
       <div>
         <h2 class="panel-title" style="margin-bottom:4px;">Econometric Parameter Estimation Architecture</h2>
         <p style="font-size:0.75rem; color:var(--text-muted); margin:0;">
-          Contemporaneous retail relationship estimated via OLS on FRED landmark macroeconomic series (2000–2024, N=16). Labor transmission, inflation dynamics, and recession stress scoring are illustrative simulation assumptions.
+          Contemporaneous retail OLS and recession logistic models estimated on FRED landmark series (2000–2024, N=16). Labor transmission and inflation dynamics are illustrative simulation assumptions.
         </p>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <span class="econ-badge sig">Empirically Fitted OLS (Retail YoY ~ UNRATE)</span>
-        <span class="econ-badge">Illustrative Policy Assumptions (Labor, Inflation, Recession)</span>
+        <span class="econ-badge sig">Empirically Fitted (Retail OLS &amp; Sample Logistic MLE)</span>
+        <span class="econ-badge">Illustrative Policy Assumptions (Labor &amp; Inflation)</span>
         <span class="econ-badge">Conditional-Mean CI (±1.96·SE_mean)</span>
       </div>
     </div>
@@ -1070,13 +1070,13 @@
             <td class="mono">\pm 1.96 \times s_e \sqrt{1/N + (u - \bar{u})^2 / SS_u} (Contemporaneous association; NOT a causal policy effect or validated forecast)</td>
           </tr>
           <tr>
-            <td class="row-label">Recession Probability (Stress Index)</td>
-            <td><span class="econ-badge">Illustrative Scoring Index</span></td>
+            <td class="row-label">Recession Scoring (12mo)</td>
+            <td><span class="econ-badge sig">Sample-Fitted Logistic MLE</span></td>
             <td class="mono">z = \beta_0 + \beta_r r + \beta_u u_{12}</td>
             <td class="mono">\beta_0 = -5.138, \beta_r = 0.126, \beta_u = 0.652</td>
-            <td class="mono" style="color:var(--text-muted);">N/A</td>
-            <td class="mono" style="color:var(--text-muted);">N/A — MLE Diverges (cond(H)=1.79e12; quasi-separation on 16 obs)</td>
-            <td class="mono">P = 1 / (1 + e^{-z}) (Monotonic stress index, NOT validated probability)</td>
+            <td class="mono">3.560 / 0.433 / 0.464</td>
+            <td class="mono">LL = -7.22, Pseudo R² = 0.198 (z = 0.29, p = 0.772; z = 1.41, p = 0.160)</td>
+            <td class="mono">P = 1 / (1 + e^{-z}) (Fitted to 16 landmark snapshots, eigenvalues &gt; 0; NOT an independently validated forward forecast)</td>
           </tr>
         </tbody>
       </table>

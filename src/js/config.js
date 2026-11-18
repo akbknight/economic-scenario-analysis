@@ -123,14 +123,19 @@ const EMPIRICAL_CONSTANTS = {
     note: "Contemporaneous descriptive historical association among landmark years (N=16). Not an identified causal policy effect or validated 12-month forecast.",
   },
   recession: {
-    name: "Illustrative Macro Stress Scoring Index",
-    classification: "Illustrative Macro Stress Scoring Index",
-    is_empirically_fitted: false,
+    name: "Sample-Fitted Logistic Model (Recession Scoring)",
+    classification: "Sample-Fitted Logistic MLE (Unvalidated Forecast)",
+    is_empirically_fitted: true,
     specification: "z = \\beta_0 + \\beta_r \\cdot r + \\beta_u \\cdot u_{12}; P = 1/(1+e^{-z})",
     intercept: -5.1379,
+    intercept_se: 3.5595,
     rate_coef: 0.1257,
+    rate_se: 0.4334,
     unemp_coef: 0.6524,
-    note: "Stylized scoring formula. Quasi-complete separation on 16 observations (4 recession years) prevents valid MLE identification.",
+    unemp_se: 0.4639,
+    pseudo_r2: 0.1976,
+    log_likelihood: -7.2199,
+    note: "Fitted via MLE on 16 landmark snapshots (LL = -7.22, pseudo-R² = 0.198). Large standard errors (rate p=0.772, unemp p=0.160) and lack of out-of-sample temporal validation mean this is a sample-fitted sensitivity score, NOT an independently validated prospective forecast.",
   },
 };
 

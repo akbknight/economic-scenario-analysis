@@ -13,7 +13,7 @@
  *      macroeconomic data (2000-2024, N=16) with parameter conditional-mean confidence intervals.
  *    - Labor & Inflation: Illustrative policy sensitivity assumptions (+0.15pp labor slack per 100bp,
  *      0.65 persistence, -0.08 drag).
- *    - Recession: Illustrative macro stress scoring index.
+ *    - Recession: Sample-fitted logistic model on landmark snapshots (unvalidated forward forecast).
  */
 
 "use strict";

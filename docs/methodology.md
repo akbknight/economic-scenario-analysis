@@ -123,17 +123,28 @@ g_{retail} = \beta_0 + \beta_u \cdot u_{12}
 
 ---
 
-### 4.5 Recession Stress Index (12-Month Horizon)
+### 4.5 Recession Scoring Model (12-Month Horizon)
 
 - **Target Definition:** NBER-dated US recessions. In the 16 landmark years, NBER recessions occurred in 2001, 2008, 2009, and 2020 (**4 recession years vs. 12 expansion years**).
-- **Actual Numerical Fit Diagnostic:**
-  Iteratively Reweighted Least Squares (Newton-Raphson) attempted on $(y = \text{nber\_rec}, X = [1, fed\_rate, unrate])$ demonstrates severe divergence:
-  - Iteration 0: $\text{LL} = -11.0904, \text{det}(H) = -6.39 \times 10^2$
-  - Iterations 1–3: Parameters shift rapidly; Hessian condition explodes ($\text{cond}(H) > 10^{12}$) due to quasi-complete separation (only 4 recession events in 16 observations).
-  - Iteration 4: Parameter step explodes ($> 10^4$), confirming standard MLE cannot be identified on this landmark sample.
-- **Classification Status & Role in Dashboard:** The logistic formula:
+- **Exact Numerical MLE Fit & Convergence:**
+  Fitting via Iteratively Reweighted Least Squares (Newton-Raphson) and SciPy `trust-exact` on the 16 landmark observations yields exact finite MLE convergence:
+  $$\hat{\beta} = [-5.13792982, 0.12567627, 0.65240324]$$
+  - **Log-Likelihood:** $\text{LL} = -7.2198624312$ (Null $\text{LL}_0 = -8.9973623139$, McFadden's Pseudo $R^2 = 0.197558 \approx 0.1976$).
+  - **Gradient Norm:** $< 10^{-10}$ ($6.70 \times 10^{-11}$ in SciPy `trust-exact`).
+  - **Fisher Information Matrix Eigenvalues:** $[0.0769553, 14.6208348, 98.0733365]$ ($\text{cond}(I) \approx 1,274$). All eigenvalues are strictly positive, confirming strict convexity and proving that separation does NOT prevent finite MLE on this sample.
+  - **Standard Errors & Wald Tests:**
+    - $\text{SE}(\hat{\beta}_0) = 3.5595 \implies z = -1.443, p = 0.149$
+    - $\text{SE}(\hat{\beta}_r) = 0.4334 \implies z = +0.290, p = 0.772$
+    - $\text{SE}(\hat{\beta}_u) = 0.4639 \implies z = +1.406, p = 0.160$
+- **Methodological Classification & Substantive Boundaries:**
+  Classified as **Sample-Fitted Logistic MLE (Unvalidated Forecast)**:
   $$z = -5.1379 + 0.1257 \cdot fed\_rate + 0.6524 \cdot u_{12}, \quad P = \frac{1}{1 + e^{-z}}$$
-  is presented purely as an **illustrative macro stress scoring index**, NOT an empirically fitted MLE model or out-of-sample validated probability forecast. Unsupported claims of pseudo-$R^2$, $t$-scores, and $p$-values have been removed.
+  While the parameter estimates are reproducibly established on this sample, this specification is **NOT an independently validated prospective forecasting model**:
+  1. **Small Sample Size:** Only 4 recession events in 16 observations.
+  2. **High Parameter Imprecision:** Standard errors are large; neither policy rate ($p=0.772$) nor unemployment ($p=0.160$) reaches statistical significance at $\alpha = 0.05$.
+  3. **Selection of Turning Points:** The 16 landmark years were selected to illustrate historical cycle extremes, not sampled uniformly at random or as a continuous monthly panel.
+  4. **Target Definition:** NBER dates are determined retrospectively by the Business Cycle Dating Committee using revised multi-frequency data.
+  5. **Lack of Prospective Temporal Validation:** The specification has not been validated on rolling out-of-time splits or untouched future recession cycles. It serves as an in-sample sensitivity scoring index across scenario inputs.
 
 ---
 

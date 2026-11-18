@@ -55,6 +55,126 @@
       "residual_std_error": 5.1609
     }
   },
+  "logistic_fits": {
+    "recession_classifier": {
+      "model": "Recession Indicator ~ Fed Funds Rate + Unemployment Rate (Logistic MLE)",
+      "sample_size": 16,
+      "recession_events": 4,
+      "expansion_events": 12,
+      "convergence": {
+        "converged": true,
+        "iterations": 6,
+        "final_gradient_norm": "2.13e-15",
+        "information_eigenvalues": [
+          0.0769553,
+          14.6208348,
+          98.0733365
+        ],
+        "information_positive_definite": true
+      },
+      "coefficients": {
+        "intercept": -5.13792982,
+        "rate_coef": 0.12567627,
+        "unemp_coef": 0.65240324
+      },
+      "standard_errors": {
+        "intercept_se": 3.5595,
+        "rate_se": 0.4334,
+        "unemp_se": 0.4639
+      },
+      "z_scores": {
+        "intercept_z": -1.443,
+        "rate_z": 0.29,
+        "unemp_z": 1.406
+      },
+      "p_values": {
+        "intercept_p": 0.149,
+        "rate_p": 0.772,
+        "unemp_p": 0.16
+      },
+      "fit_metrics": {
+        "log_likelihood": -7.2198624312,
+        "null_log_likelihood": -8.9973623139,
+        "pseudo_r2": 0.197558
+      },
+      "iteration_log": [
+        {
+          "iteration": 0,
+          "beta": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "log_likelihood": -11.090354889,
+          "gradient_norm": "2.08e+01",
+          "max_step": "3.83e+00"
+        },
+        {
+          "iteration": 1,
+          "beta": [
+            -3.82779723,
+            0.07269937,
+            0.4915644
+          ],
+          "log_likelihood": -7.3751046852,
+          "gradient_norm": "3.28e+00",
+          "max_step": "1.11e+00"
+        },
+        {
+          "iteration": 2,
+          "beta": [
+            -4.94070056,
+            0.11437447,
+            0.62888703
+          ],
+          "log_likelihood": -7.2224893923,
+          "gradient_norm": "3.83e-01",
+          "max_step": "1.92e-01"
+        },
+        {
+          "iteration": 3,
+          "beta": [
+            -5.13276812,
+            0.12527949,
+            0.65180363
+          ],
+          "log_likelihood": -7.2198638595,
+          "gradient_norm": "8.02e-03",
+          "max_step": "5.16e-03"
+        },
+        {
+          "iteration": 4,
+          "beta": [
+            -5.13792631,
+            0.12567595,
+            0.65240284
+          ],
+          "log_likelihood": -7.2198624312,
+          "gradient_norm": "4.48e-06",
+          "max_step": "3.52e-06"
+        },
+        {
+          "iteration": 5,
+          "beta": [
+            -5.13792982,
+            0.12567627,
+            0.65240324
+          ],
+          "log_likelihood": -7.2198624312,
+          "gradient_norm": "1.87e-12",
+          "max_step": "1.57e-12"
+        }
+      ],
+      "methodological_classification": "Sample-Fitted Logistic MLE (Unvalidated Forecast)",
+      "substantive_limitations": [
+        "Small sample size (N=16 total landmark years, with only 4 recession events: 2001, 2008, 2009, 2020).",
+        "High estimation uncertainty: Neither policy rate (p=0.772) nor unemployment (p=0.160) reaches statistical significance at alpha=0.05.",
+        "Selected landmark snapshots chosen to illustrate cyclical extremes; not sampled uniformly or continuously.",
+        "NBER target definition is determined retrospectively; fitting on annual landmark snapshots does not establish prospective forecasting capability.",
+        "Absence of prospective temporal validation: Model has not been validated on rolling out-of-time splits or untouched holdout cycles."
+      ]
+    }
+  },
   "model_components": {
     "retail_consumption": {
       "classification": "Empirically Fitted Contemporaneous OLS",
@@ -110,18 +230,49 @@
       ]
     },
     "recession_indicator": {
-      "classification": "Illustrative Macro Stress Scoring Index",
-      "is_empirically_fitted": false,
-      "assumed_parameters": {
-        "intercept": -5.1379,
-        "rate_coef": 0.1257,
-        "unemp_coef": 0.6524
-      },
-      "fit_diagnostic": {
-        "diagnostic_title": "Logistic MLE Separation Diagnostic on Landmark Snapshots",
+      "classification": "Sample-Fitted Logistic MLE (Unvalidated Forecast)",
+      "is_empirically_fitted": true,
+      "fit_results": {
+        "model": "Recession Indicator ~ Fed Funds Rate + Unemployment Rate (Logistic MLE)",
         "sample_size": 16,
         "recession_events": 4,
         "expansion_events": 12,
+        "convergence": {
+          "converged": true,
+          "iterations": 6,
+          "final_gradient_norm": "2.13e-15",
+          "information_eigenvalues": [
+            0.0769553,
+            14.6208348,
+            98.0733365
+          ],
+          "information_positive_definite": true
+        },
+        "coefficients": {
+          "intercept": -5.13792982,
+          "rate_coef": 0.12567627,
+          "unemp_coef": 0.65240324
+        },
+        "standard_errors": {
+          "intercept_se": 3.5595,
+          "rate_se": 0.4334,
+          "unemp_se": 0.4639
+        },
+        "z_scores": {
+          "intercept_z": -1.443,
+          "rate_z": 0.29,
+          "unemp_z": 1.406
+        },
+        "p_values": {
+          "intercept_p": 0.149,
+          "rate_p": 0.772,
+          "unemp_p": 0.16
+        },
+        "fit_metrics": {
+          "log_likelihood": -7.2198624312,
+          "null_log_likelihood": -8.9973623139,
+          "pseudo_r2": 0.197558
+        },
         "iteration_log": [
           {
             "iteration": 0,
@@ -130,103 +281,83 @@
               0.0,
               0.0
             ],
-            "log_likelihood": -11.0904,
-            "hessian_determinant": "-6.3926e+02",
-            "abs_det": 639.2553489387519
+            "log_likelihood": -11.090354889,
+            "gradient_norm": "2.08e+01",
+            "max_step": "3.83e+00"
           },
           {
             "iteration": 1,
             "beta": [
-              -3.8278,
-              0.0727,
-              0.4916
+              -3.82779723,
+              0.07269937,
+              0.4915644
             ],
-            "log_likelihood": -7.3751,
-            "hessian_determinant": "-2.0975e+02",
-            "abs_det": 209.75216334957076
+            "log_likelihood": -7.3751046852,
+            "gradient_norm": "3.28e+00",
+            "max_step": "1.11e+00"
           },
           {
             "iteration": 2,
             "beta": [
-              -4.9407,
-              0.1144,
-              0.6289
+              -4.94070056,
+              0.11437447,
+              0.62888703
             ],
-            "log_likelihood": -7.2225,
-            "hessian_determinant": "-1.2072e+02",
-            "abs_det": 120.7208734211963
+            "log_likelihood": -7.2224893923,
+            "gradient_norm": "3.83e-01",
+            "max_step": "1.92e-01"
           },
           {
             "iteration": 3,
             "beta": [
-              -5.1328,
-              0.1253,
-              0.6518
+              -5.13276812,
+              0.12527949,
+              0.65180363
             ],
-            "log_likelihood": -7.2199,
-            "hessian_determinant": "-1.1057e+02",
-            "abs_det": 110.56586458680567
+            "log_likelihood": -7.2198638595,
+            "gradient_norm": "8.02e-03",
+            "max_step": "5.16e-03"
           },
           {
             "iteration": 4,
             "beta": [
-              -5.1379,
-              0.1257,
-              0.6524
+              -5.13792631,
+              0.12567595,
+              0.65240284
             ],
-            "log_likelihood": -7.2199,
-            "hessian_determinant": "-1.1035e+02",
-            "abs_det": 110.34745799417533
+            "log_likelihood": -7.2198624312,
+            "gradient_norm": "4.48e-06",
+            "max_step": "3.52e-06"
           },
           {
             "iteration": 5,
             "beta": [
-              -5.1379,
-              0.1257,
-              0.6524
+              -5.13792982,
+              0.12567627,
+              0.65240324
             ],
-            "log_likelihood": -7.2199,
-            "hessian_determinant": "-1.1035e+02",
-            "abs_det": 110.34733228165169
-          },
-          {
-            "iteration": 6,
-            "beta": [
-              -5.1379,
-              0.1257,
-              0.6524
-            ],
-            "log_likelihood": -7.2199,
-            "hessian_determinant": "-1.1035e+02",
-            "abs_det": 110.34733228160121
-          },
-          {
-            "iteration": 7,
-            "beta": [
-              -5.1379,
-              0.1257,
-              0.6524
-            ],
-            "log_likelihood": -7.2199,
-            "hessian_determinant": "-1.1035e+02",
-            "abs_det": 110.34733228160076
+            "log_likelihood": -7.2198624312,
+            "gradient_norm": "1.87e-12",
+            "max_step": "1.57e-12"
           }
         ],
-        "conclusion": "Standard logistic MLE diverges due to quasi-complete separation. The recession scoring formula is therefore retained purely as an illustrative heuristic stress index, NOT an empirically fitted or validated probability model."
+        "methodological_classification": "Sample-Fitted Logistic MLE (Unvalidated Forecast)",
+        "substantive_limitations": [
+          "Small sample size (N=16 total landmark years, with only 4 recession events: 2001, 2008, 2009, 2020).",
+          "High estimation uncertainty: Neither policy rate (p=0.772) nor unemployment (p=0.160) reaches statistical significance at alpha=0.05.",
+          "Selected landmark snapshots chosen to illustrate cyclical extremes; not sampled uniformly or continuously.",
+          "NBER target definition is determined retrospectively; fitting on annual landmark snapshots does not establish prospective forecasting capability.",
+          "Absence of prospective temporal validation: Model has not been validated on rolling out-of-time splits or untouched holdout cycles."
+        ]
       },
-      "unsupported_claims_removed": [
-        "pseudo_r2 (0.198)",
-        "p_vals",
-        "t_stats",
-        "validated probability claim"
-      ]
+      "caveats": "Empirically fitted to the 16 landmark snapshots (LL = -7.2199, pseudo-R\u00b2 = 0.1976). Not an independently validated prospective forecasting model; large standard errors reflect small-sample limitations."
     }
   },
   "methodological_distinctions": {
     "parameter_uncertainty": "SE(beta) describes sampling standard deviation of coefficient estimators.",
     "conditional_mean_interval": "mu_hat(x) +- t * s_e * sqrt(1/n + (x - x_bar)^2 / SS_xx). Uncertainty of the expected average response.",
     "forecast_prediction_interval": "y_new +- t * s_e * sqrt(1 + 1/n + (x - x_bar)^2 / SS_xx). Substantially wider due to individual residual variance s_e^2.",
-    "recession_scoring_classification": "Illustrative macro stress scoring formula. With only 4 recession events in N=16 non-consecutive years, it is NOT an out-of-sample validated probability model.",
+    "recession_mle_classification": "Empirically fitted in-sample via MLE on 16 landmark snapshots. Due to small sample size (4 events) and selection of turning points, it is NOT an out-of-sample validated probability forecast.",
     "lag_structure_limitation": "Multi-year gaps (up to 5 years between 2010 and 2015) violate uniform annual lag assumptions (t -> t+1). Continuous annual series is required for valid dynamic lag estimation."
   }
 }
